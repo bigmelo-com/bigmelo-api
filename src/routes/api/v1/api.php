@@ -20,4 +20,7 @@ Route::prefix('/auth')->group(function() {
     Route::post('/get-token', 'App\Http\Controllers\api\v1\AuthController@getToken');
 });
 
+Route::prefix('/message')->group(function() {
+    Route::post('', 'App\Http\Controllers\api\v1\MessageController@store')->middleware(['auth:sanctum', 'abilities:message:store']);
+});
 

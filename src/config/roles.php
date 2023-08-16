@@ -15,7 +15,8 @@ return [
 
     'admin' => [
         'abilities' => [
-            'test:test'
+            'test:test',
+            'message:store'
         ]
     ],
 

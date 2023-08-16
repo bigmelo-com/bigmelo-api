@@ -27,9 +27,9 @@ class AuthControllerTest extends TestApi
      *
      * @return void
      */
-    public function get_access_token_with_email_and_password()
+    public function get_access_token_with_email_and_password(): void
     {
-        $response = $this->json('post', '/api/v1/auth/get-token', [
+        $response = $this->json('post', self::ENDPOINT_AUTH . '/get-token', [
             'email' => 'admin@mydomain.com',
             'password' => 'qwerty123',
         ]);
@@ -43,7 +43,7 @@ class AuthControllerTest extends TestApi
      *
      * @return void
      */
-    public function login_error_wrong_credentials()
+    public function login_error_wrong_credentials(): void
     {
         $response = $this->json('post', '/api/v1/auth/get-token', [
             'email' => 'wrong_email@mydomain.com',
