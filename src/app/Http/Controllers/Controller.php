@@ -7,7 +7,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
 /**
- * @OA\Info(title="GoEV API", version="0.1")
+ * @OA\Info(title="bigmelo API", version="0.1")
  *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
