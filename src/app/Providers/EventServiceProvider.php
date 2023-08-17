@@ -18,6 +18,13 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        /*
+         * User message events
+         */
+        'App\Events\Message\MessageStored' => [
+            'App\Listeners\Message\GetChatGPTMessage',
+        ],
     ];
 
     /**

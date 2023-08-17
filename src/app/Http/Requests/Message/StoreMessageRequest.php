@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Subscriber;
+namespace App\Http\Requests\Message;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreSubscriberRequest extends FormRequest
+class StoreMessageRequest extends FormRequest
 {
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -14,7 +15,7 @@ class StoreSubscriberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|int|exists:users,id',
+            'message' => 'required|string'
         ];
     }
 }
