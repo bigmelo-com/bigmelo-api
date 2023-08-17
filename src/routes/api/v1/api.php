@@ -21,6 +21,7 @@ Route::prefix('/auth')->group(function() {
 });
 
 Route::prefix('/message')->group(function() {
+    Route::get('', 'App\Http\Controllers\api\v1\MessageController@index')->middleware(['auth:sanctum', 'abilities:message:get']);;
     Route::post('', 'App\Http\Controllers\api\v1\MessageController@store')->middleware(['auth:sanctum', 'abilities:message:store']);
 });
 

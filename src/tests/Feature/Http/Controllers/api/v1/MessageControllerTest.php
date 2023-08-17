@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\api\v1;
 
-use App\Events\Message\MessageStored;
+use App\Models\Message;
 use Illuminate\Support\Facades\Event;
 
 /**
@@ -52,5 +52,56 @@ class MessageControllerTest extends TestApi
 
         $response->assertStatus(422);
         $response->assertJsonStructure(['errors' => ['message']]);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_list_all_message_by_user_id(): void
+    {
+        $message1 = Message::create([
+            'user_id' => 1,
+            'content' => $this->faker->text(300),
+            'source'  => 'API'
+        ]);
+        $message2 = Message::create([
+            'user_id' => 1,
+            'content' => $this->faker->text(300),
+            'source'  => 'ChatGPT'
+        ]);
+        $message3 = Message::create([
+            'user_id' => 1,
+            'content' => $this->faker->text(300),
+            'source'  => 'API'
+        ]);
+        $message4 = Message::create([
+            'user_id' => 2,
+            'content' => $this->faker->text(300),
+            'source'  => 'ChatGPT'
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('GET', self::ENDPOINT_MESSAGE . '?user_id=1');
+
+        $response_data = json_decode($response->getContent())->data;
+
+        $response->assertStatus(200);
+        $this->assertCount(3, $response_data);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthorized_user_can_not_list_messages()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->faker->word())
+            ->json('GET', self::ENDPOINT_MESSAGE . '?user_id=1');
+
+        $response->assertStatus(401);
+        $response->assertJsonPath('message', 'Unauthenticated.');
     }
 }
