@@ -16,7 +16,7 @@ class ChatGPTClient
      */
     public function __construct()
     {
-        $api_key = config('chat-gpt.api_key');
+        $api_key = config('bigmelo.chat_gpt.api_key');
         $this->client = \OpenAI::client($api_key);
     }
 

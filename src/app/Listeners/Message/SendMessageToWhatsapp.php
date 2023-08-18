@@ -2,6 +2,7 @@
 
 namespace App\Listeners\Message;
 
+use App\Classes\Twilio\TwilioClient;
 use App\Events\Message\AdminMessageStored;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,6 +18,10 @@ class SendMessageToWhatsapp
         $admin_message = $event->message;
 
         try {
+            $twilio_client = new TwilioClient('+14155238886');
+
+            $twilio_client->sendMessageToWhatsapp('+573128120586', $admin_message->content);
+
             Log::info(
                 'Message sent to whatsapp, ' .
                 'message_id: ' //. $message->id
