@@ -12,14 +12,14 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class MessageStored
+class ApiMessageStored
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var Message
      */
-    public $message;
+    public Message $message;
 
     /**
      * Create a new event instance
@@ -33,7 +33,7 @@ class MessageStored
         $this->message = $message;
 
         Log::info(
-            "Event: Message stored, " .
+            "Event: Api Message stored, " .
             "message_id: " . $message->id
         );
     }

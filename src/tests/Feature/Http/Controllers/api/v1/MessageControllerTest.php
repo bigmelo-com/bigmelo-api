@@ -29,12 +29,14 @@ class MessageControllerTest extends TestApi
     {
         Event::fake();
 
-        $message = $this->faker->text(300);
+        $message_data = [
+            'message' => $this->faker->text(300),
+            'source'  => 'API',
+            'user_id' => 1
+        ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
-            ->json('POST', self::ENDPOINT_MESSAGE, [
-                'message' => $message
-            ]);
+            ->json('POST', self::ENDPOINT_MESSAGE, $message_data);
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['message']);
@@ -52,6 +54,28 @@ class MessageControllerTest extends TestApi
 
         $response->assertStatus(422);
         $response->assertJsonStructure(['errors' => ['message']]);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_store_a_new_message(): void
+    {
+        Event::fake();
+
+        $message_data = [
+            'message' => $this->faker->text(300),
+            'source'  => 'Admin',
+            'user_id' => 1
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('POST', self::ENDPOINT_MESSAGE, $message_data);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'Message has been stored successfully.');
     }
 
     /**

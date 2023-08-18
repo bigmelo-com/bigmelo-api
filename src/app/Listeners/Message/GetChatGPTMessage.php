@@ -3,7 +3,7 @@
 namespace App\Listeners\Message;
 
 use App\Classes\ChatGPT\ChatGPTClient;
-use App\Events\Message\MessageStored;
+use App\Events\Message\ApiMessageStored;
 use App\Models\Message;
 use Illuminate\Support\Facades\Log;
 
@@ -12,11 +12,11 @@ class GetChatGPTMessage
     /**
      * Handle the event.
      */
-    public function handle(MessageStored $event): void
+    public function handle(ApiMessageStored $event): void
     {
-        try {
-            $user_message = $event->message;
+        $user_message = $event->message;
 
+        try {
             $chat = new ChatGPTClient();
 
             $chatpgt_message = $chat->getMessage($user_message->content);

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\Message\ApiMessageStored;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -22,8 +23,15 @@ class EventServiceProvider extends ServiceProvider
         /*
          * User message events
          */
-        'App\Events\Message\MessageStored' => [
+        'App\Events\Message\ApiMessageStored' => [
             'App\Listeners\Message\GetChatGPTMessage',
+        ],
+
+        /*
+         * Admin message events
+         */
+        'App\Events\Message\AdminMessageStored' => [
+            'App\Listeners\Message\SendMessageToWhatsapp',
         ],
     ];
 

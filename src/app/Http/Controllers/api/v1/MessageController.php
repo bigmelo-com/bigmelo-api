@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\api\v1;
 
-use App\Events\Message\MessageStored;
+use App\Events\Message\AdminMessageStored;
+use App\Events\Message\ApiMessageStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageCollection;
@@ -101,13 +102,23 @@ class MessageController extends Controller
      *         @OA\MediaType(
      *             mediaType="application/json",
      *             @OA\Schema(
-     *                 required={"message"},
+     *                 required={"message", "source"},
      *                 @OA\Property(
      *                     property="message",
      *                     type="string"
      *                 ),
+     *                 @OA\Property(
+     *                     property="source",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="user_id",
+     *                     type="integer"
+     *                 ),
      *                 example={
-     *                     "message": "Por que la velocidad de la luz es constante?"
+     *                     "message": "Por que la velocidad de la luz es constante?",
+     *                     "source": "API",
+     *                     "user_id": 1
      *                  }
      *             )
      *         )
@@ -134,13 +145,21 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request): JsonResponse
     {
         try {
+            $user_id = $request->user_id ?? $request->user()->id;
+            $source  = $request->source;
+
             $message = Message::create([
-                'user_id' => $request->user()->id,
+                'user_id' => $user_id,
                 'content' => $request->message,
-                'source'  => 'API'
+                'source'  => $source
             ]);
 
-            event(new MessageStored($message));
+            if ($message->source == 'Admin') {
+                event(new AdminMessageStored($message));
+                return response()->json(['message' => 'Message has been stored successfully.'], 200);
+            }
+
+            event(new ApiMessageStored($message));
 
             $last_message = Message::latest()->firstOrFail();
 
