@@ -2,9 +2,9 @@
 
 namespace App\Classes\Twilio;
 
-use App\Exceptions\Twilio\TwilioClientCouldNotSendAMessageToWhatsappException;
+use App\Exceptions\Twilio\TwilioRequestValidatorCouldNotGetMessageException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 use Twilio\Security\RequestValidator;
 
 class TwilioWhatsAppRequestValidator
@@ -34,11 +34,9 @@ class TwilioWhatsAppRequestValidator
      */
     public function __construct(Request $request)
     {
-        $headers = $request->header();
-
         $this->token = config('bigmelo.twilio.token');
 
-        $this->signature = $headers['x-twilio-signature'][0];
+        $this->signature = $request->header('X-Twilio-Signature');
 
         $this->url = $request->fullUrl();
 
@@ -49,18 +47,23 @@ class TwilioWhatsAppRequestValidator
      * Validate the request from WhatsApp Twilio
      *
      * @return bool
+     *
+     * @throws TwilioRequestValidatorCouldNotGetMessageException
      */
     public function isValidRequest(): bool
     {
-        $validator = new RequestValidator($this->token);
+        try {
+            if (in_array(Config::get('app.env'), ['local', 'dev', 'stage'])) {
+                return true;
+            }
 
-        Log::error(
-            'signature: ' . $this->signature . ', ' .
-            'url: ' . $this->url . ', ' .
-            'content: ' . json_encode($this->content)
-        );
+            $validator = new RequestValidator($this->token);
 
-        return $validator->validate($this->signature, $this->url, $this->content);
+            return $validator->validate($this->signature, $this->url, $this->content);
+
+        } catch (\Throwable $e) {
+            throw new TwilioRequestValidatorCouldNotGetMessageException($e->getMessage());
+        }
     }
 
 }

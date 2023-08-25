@@ -24,7 +24,7 @@ class SendMessageToWhatsapp
 
             Log::info(
                 'Message sent to whatsapp, ' .
-                'message_id: ' //. $message->id
+                'message_id: ' . $admin_message->id
             );
 
         } catch (\Throwable $e) {
