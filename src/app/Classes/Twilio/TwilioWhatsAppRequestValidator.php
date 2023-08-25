@@ -4,6 +4,7 @@ namespace App\Classes\Twilio;
 
 use App\Exceptions\Twilio\TwilioClientCouldNotSendAMessageToWhatsappException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Twilio\Security\RequestValidator;
 
 class TwilioWhatsAppRequestValidator
@@ -53,6 +54,12 @@ class TwilioWhatsAppRequestValidator
     public function isValidRequest(): bool
     {
         $validator = new RequestValidator($this->token);
+
+        Log::error(
+            'signature: ' . $this->signature . ', ' .
+            'url: ' . $this->url . ', ' .
+            'content: ' . json_encode($this->content)
+        );
 
         return $validator->validate($this->signature, $this->url, $this->content);
     }
