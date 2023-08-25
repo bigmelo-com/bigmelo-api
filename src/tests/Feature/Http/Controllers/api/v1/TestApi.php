@@ -23,7 +23,7 @@ class TestApi extends TestCase
      */
     protected function getToken(): string
     {
-        $response = $this->json('post', '/api/v1/auth/get-token', [
+        $response = $this->json('post', '/v1/auth/get-token', [
             'email' => 'admin@mydomain.com',
             'password' => 'qwerty123',
         ]);

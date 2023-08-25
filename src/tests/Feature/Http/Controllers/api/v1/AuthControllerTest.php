@@ -20,7 +20,7 @@ class AuthControllerTest extends TestApi
     /**
      * Auth api endpoint
      */
-    const ENDPOINT_AUTH = '/api/v1/auth';
+    const ENDPOINT_AUTH = '/v1/auth';
 
     /**
      * @test
@@ -45,7 +45,7 @@ class AuthControllerTest extends TestApi
      */
     public function login_error_wrong_credentials(): void
     {
-        $response = $this->json('post', '/api/v1/auth/get-token', [
+        $response = $this->json('post', '/v1/auth/get-token', [
             'email' => 'wrong_email@mydomain.com',
             'password' => 'wrong_password',
         ]);

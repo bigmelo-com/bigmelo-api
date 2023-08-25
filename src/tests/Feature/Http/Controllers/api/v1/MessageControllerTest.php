@@ -18,7 +18,7 @@ class MessageControllerTest extends TestApi
     /**
      * Message api endpoint
      */
-    const ENDPOINT_MESSAGE = '/api/v1/message';
+    const ENDPOINT_MESSAGE = '/v1/message';
 
     /**
      * @test
