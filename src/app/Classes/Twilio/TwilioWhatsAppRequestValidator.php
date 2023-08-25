@@ -40,10 +40,9 @@ class TwilioWhatsAppRequestValidator
 
         $this->signature = $headers['x-twilio-signature'][0];
 
-        $this->url = $request->headers->get('referer');
+        $this->url = $request->fullUrl();
 
-        $raw_content = $request->getContent();
-        parse_str($raw_content, $this->content);
+        $this->content = $request->toArray();
     }
 
     /**
