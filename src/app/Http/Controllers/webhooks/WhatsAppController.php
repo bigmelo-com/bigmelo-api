@@ -5,6 +5,7 @@ namespace App\Http\Controllers\webhooks;
 use App\Classes\Twilio\TwilioWhatsAppRequestValidator;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
