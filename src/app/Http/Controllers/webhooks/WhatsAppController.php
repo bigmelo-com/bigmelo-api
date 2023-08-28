@@ -16,6 +16,7 @@ class WhatsAppController extends Controller
         try {
             $raw_content = $request->getContent();
             parse_str($raw_content, $content);
+            Log::info($raw_content);
 
             $whatsapp_validator = new TwilioWhatsAppRequestValidator($request);
 
