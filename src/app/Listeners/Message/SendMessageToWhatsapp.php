@@ -18,9 +18,12 @@ class SendMessageToWhatsapp
         $admin_message = $event->message;
 
         try {
+            $user = $admin_message->user;
+            $phone_number = $user->country_code . $user->phone_number;
+
             $twilio_client = new TwilioClient(env('TWILIO_PHONE_NUMBER'));
 
-            $twilio_client->sendMessageToWhatsapp(env('TEST_PHONE'), $admin_message->content);
+            $twilio_client->sendMessageToWhatsapp($phone_number, $admin_message->content);
 
             Log::info(
                 'Message sent to whatsapp, ' .
