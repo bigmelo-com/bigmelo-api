@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\webhooks;
 
 use App\Classes\Twilio\TwilioWhatsAppRequestValidator;
+use App\Events\Message\WhatsAppMessageStored;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\User;
@@ -56,6 +57,8 @@ class WhatsAppController extends Controller
                     'content' => $message_text,
                     'source'  => 'WhatsApp'
                 ]);
+
+                event(new WhatsAppMessageStored($message));
 
                 Log::info(
                     'Message from whatsapp stored, ' .

@@ -33,6 +33,20 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Message\AdminMessageStored' => [
             'App\Listeners\Message\SendMessageToWhatsapp',
         ],
+
+        /*
+         * WhatsApp message events
+         */
+        'App\Events\Message\WhatsAppMessageStored' => [
+            'App\Listeners\Message\GetChatGPTMessage',
+        ],
+
+        /*
+         * ChatGPT message events
+         */
+        'App\Events\Message\ChatGPTMessageStored' => [
+            'App\Listeners\Message\SendMessageToWhatsapp',
+        ],
     ];
 
     /**
