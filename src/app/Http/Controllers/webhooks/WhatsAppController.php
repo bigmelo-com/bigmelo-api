@@ -33,7 +33,7 @@ class WhatsAppController extends Controller
             if ($whatsapp_validator->isValidRequest()) {
                 $message_text = $content['Body'];
                 $from_number = str_replace('whatsapp:', '', $content['From']);
-                $user = User::where('full_phone_number', '+' . $from_number)->first();
+                $user = User::where('full_phone_number', $from_number)->first();
 
                 if (!$user) {
                     $message = Message::create([
@@ -44,7 +44,8 @@ class WhatsAppController extends Controller
 
                     Log::info(
                         'Message from a unknown whatsapp number stored, ' .
-                        'message_id: ' . $message->id
+                        'message_id: ' . $message->id . ', ' .
+                        'phone_number: ' . $from_number
                     );
 
                     return response()->json(['message' => 'User not found.'], 404);
