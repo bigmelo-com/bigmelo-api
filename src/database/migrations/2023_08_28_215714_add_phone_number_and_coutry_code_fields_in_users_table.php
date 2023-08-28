@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('country_code', 5)->nullable()->after('email');
             $table->string('phone_number', 20)->nullable()->after('country_code');
+            $table->string('full_phone_number', 20)->nullable()->after('phone_number');
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('full_phone_number');
             $table->dropColumn('phone_number');
             $table->dropColumn('country_code');
         });
