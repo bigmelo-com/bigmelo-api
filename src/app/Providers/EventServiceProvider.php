@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\Message\ApiMessageStored;
+use App\Events\Message\UserMessageStored;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,28 +23,14 @@ class EventServiceProvider extends ServiceProvider
         /*
          * User message events
          */
-        'App\Events\Message\ApiMessageStored' => [
+        'App\Events\Message\UserMessageStored' => [
             'App\Listeners\Message\GetChatGPTMessage',
         ],
 
         /*
-         * Admin message events
+         * Bigmelo message events
          */
-        'App\Events\Message\AdminMessageStored' => [
-            'App\Listeners\Message\SendMessageToWhatsapp',
-        ],
-
-        /*
-         * WhatsApp message events
-         */
-        'App\Events\Message\WhatsAppMessageStored' => [
-            'App\Listeners\Message\GetChatGPTMessage',
-        ],
-
-        /*
-         * ChatGPT message events
-         */
-        'App\Events\Message\ChatGPTMessageStored' => [
+        'App\Events\Message\BigmeloMessageStored' => [
             'App\Listeners\Message\SendMessageToWhatsapp',
         ],
     ];

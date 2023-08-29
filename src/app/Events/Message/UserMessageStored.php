@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class WhatsAppMessageStored
+class UserMessageStored
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -33,7 +33,7 @@ class WhatsAppMessageStored
         $this->message = $message;
 
         Log::info(
-            "Event: WhatsApp Message stored, " .
+            "Event: Api Message stored, " .
             "message_id: " . $message->id
         );
     }

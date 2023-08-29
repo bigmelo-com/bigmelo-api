@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\api\v1;
 
-use App\Events\Message\AdminMessageStored;
-use App\Events\Message\ApiMessageStored;
+use App\Events\Message\BigmeloMessageStored;
+use App\Events\Message\UserMessageStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageCollection;
@@ -155,11 +155,11 @@ class MessageController extends Controller
             ]);
 
             if ($message->source == 'Admin') {
-                event(new AdminMessageStored($message));
+                event(new BigmeloMessageStored($message));
                 return response()->json(['message' => 'Message has been stored successfully.'], 200);
             }
 
-            event(new ApiMessageStored($message));
+            event(new UserMessageStored($message));
 
             $last_message = Message::latest()->firstOrFail();
 

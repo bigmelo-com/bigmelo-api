@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class ChatGPTMessageStored
+class BigmeloMessageStored
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -33,7 +33,7 @@ class ChatGPTMessageStored
         $this->message = $message;
 
         Log::info(
-            "Event: ChatGPT Message stored, " .
+            "Event: Bigmelo Message stored, " .
             "message_id: " . $message->id
         );
     }

@@ -3,7 +3,8 @@
 namespace App\Listeners\Message;
 
 use App\Classes\ChatGPT\ChatGPTClient;
-use App\Events\Message\ApiMessageStored;
+use App\Events\Message\BigmeloMessageStored;
+use App\Events\Message\UserMessageStored;
 use App\Models\Message;
 use Illuminate\Support\Facades\Log;
 
@@ -12,7 +13,7 @@ class GetChatGPTMessage
     /**
      * Handle the event.
      */
-    public function handle(ApiMessageStored $event): void
+    public function handle(UserMessageStored $event): void
     {
         $user_message = $event->message;
 
@@ -26,6 +27,8 @@ class GetChatGPTMessage
                 'content' => $chatpgt_message,
                 'source'  => 'ChatGPT'
             ]);
+
+            event(new BigmeloMessageStored($message));
 
             Log::info(
                 "Listener: Get ChatGPT Message, " .
