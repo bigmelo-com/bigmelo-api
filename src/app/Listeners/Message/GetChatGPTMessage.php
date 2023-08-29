@@ -2,6 +2,7 @@
 
 namespace App\Listeners\Message;
 
+use App\Classes\ChatGPT\ChatGPTChatHistoryParser;
 use App\Classes\ChatGPT\ChatGPTClient;
 use App\Events\Message\BigmeloMessageStored;
 use App\Events\Message\UserMessageStored;
@@ -16,12 +17,16 @@ class GetChatGPTMessage
     public function handle(UserMessageStored $event): void
     {
         $user_message = $event->message;
+        $user = $user_message->user;
 
         try {
-            $chat = new ChatGPTClient();
-            $limit_prompt = 'limite la respuesta a maximo 1000 caracteres. ';
+            $old_messages = ($user->messages()->orderBy('id', 'desc')->limit(20)->get())->toArray();
+            $new_message = $user_message->content;
 
-            $chatpgt_message = $chat->getMessage($limit_prompt . $user_message->content);
+            $chat_history_parser = new ChatGPTChatHistoryParser($old_messages, $new_message);
+            $chat = new ChatGPTClient();
+
+            $chatpgt_message = $chat->getMessage($chat_history_parser->getChatHistory());
 
             $message = Message::create([
                 'user_id' => $user_message->user_id,

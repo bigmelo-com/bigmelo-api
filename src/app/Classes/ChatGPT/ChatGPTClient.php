@@ -23,19 +23,17 @@ class ChatGPTClient
     /**
      * Get message from ChatGPT Client
      *
-     * @param string $message
+     * @param array $messages
      * @return string
      *
      * @throws ChatGPTClientCouldNotGetANewMessageException
      */
-    public function getMessage(string $message): string
+    public function getMessage(array $messages): string
     {
         try {
             $response = $this->client->chat()->create([
                 'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    ['role' => 'user', 'content' => $message],
-                ],
+                'messages' => $messages,
             ]);
 
             if (isset($response->choices[0])) {
