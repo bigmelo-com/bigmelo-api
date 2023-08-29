@@ -20,7 +20,7 @@ class GetChatGPTMessage
         try {
             $chat = new ChatGPTClient();
 
-            $chatpgt_message = $chat->getMessage($user_message->content);
+            $chatpgt_message = $chat->getMessage($user_message->content . '. La respuesta maximo de 1000 caracteres.');
 
             $message = Message::create([
                 'user_id' => $user_message->user_id,
