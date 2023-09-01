@@ -25,3 +25,7 @@ Route::prefix('/message')->group(function() {
     Route::post('', 'App\Http\Controllers\api\v1\MessageController@store')->middleware(['auth:sanctum', 'abilities:message:store']);
 });
 
+Route::prefix('chat')->group(function() {
+    Route::get('', 'App\Http\Controllers\api\v1\ChatController@index')->middleware(['auth:sanctum', 'abilities:chats:get']);
+});
+

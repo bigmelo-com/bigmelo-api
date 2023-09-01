@@ -17,7 +17,8 @@ return [
         'abilities' => [
             'test:test',
             'message:get',
-            'message:store'
+            'message:store',
+            'chats:get'
         ]
     ],
 

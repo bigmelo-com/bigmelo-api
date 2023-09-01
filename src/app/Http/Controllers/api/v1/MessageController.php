@@ -22,7 +22,7 @@ class MessageController extends Controller
      * @return JsonResponse
      *
      * @OA\Get(
-     *     path="/api/v1/message",
+     *     path="/v1/message",
      *     operationId="listMessages",
      *     description="List all message of a user.",
      *     tags={"Messages"},

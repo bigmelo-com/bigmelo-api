@@ -18,7 +18,7 @@ class AuthController extends Controller
      * @return JsonResponse
      *
      * @OA\Post(
-     *     path="/api/v1/auth/get-token",
+     *     path="/v1/auth/get-token",
      *     operationId="getToken",
      *     description="Returns an access token according to the email and password.",
      *     tags={"Auth"},
