@@ -92,7 +92,7 @@ class MessageController extends Controller
      * @return JsonResponse
      *
      * @OA\Post(
-     *     path="/api/v1/message",
+     *     path="/v1/message",
      *     operationId="storeMessage",
      *     description="Store a new message.",
      *     tags={"Messages"},

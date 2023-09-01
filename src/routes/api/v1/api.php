@@ -29,3 +29,7 @@ Route::prefix('chat')->group(function() {
     Route::get('', 'App\Http\Controllers\api\v1\ChatController@index')->middleware(['auth:sanctum', 'abilities:chats:get']);
 });
 
+Route::prefix('/user')->group(function() {
+    Route::post('', 'App\Http\Controllers\api\v1\UserController@store')->middleware(['auth:sanctum', 'abilities:user:store']);
+});
+

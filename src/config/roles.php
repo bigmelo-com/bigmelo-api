@@ -18,7 +18,8 @@ return [
             'test:test',
             'message:get',
             'message:store',
-            'chats:get'
+            'chats:get',
+            'user:store'
         ]
     ],
 
