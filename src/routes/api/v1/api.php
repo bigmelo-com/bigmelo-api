@@ -31,5 +31,6 @@ Route::prefix('chat')->group(function() {
 
 Route::prefix('/user')->group(function() {
     Route::post('', 'App\Http\Controllers\api\v1\UserController@store')->middleware(['auth:sanctum', 'abilities:user:store']);
+    Route::post('/{user_id}/messages-limit', 'App\Http\Controllers\api\v1\UserMessagesLimitController@store')->middleware(['auth:sanctum', 'abilities:user:store']);
 });
 

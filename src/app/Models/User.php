@@ -100,8 +100,10 @@ class User extends Authenticatable
      */
     public function hasAvailableMessages(int $messages_number = 1): bool
     {
-        $available_messages = $this->currentMessagesLimit()->assigned - $this->currentMessagesLimit()->available;
+        if (!$this->currentMessagesLimit()) {
+            return false;
+        }
 
-        return $available_messages >= $messages_number;
+        return $this->currentMessagesLimit()->available >= $messages_number;
     }
 }
