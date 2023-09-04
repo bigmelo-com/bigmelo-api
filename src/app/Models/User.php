@@ -70,4 +70,38 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class, 'user_id');
     }
+
+    /**
+     * Messages limits related to the specific user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function message_limits(): HasMany
+    {
+        return $this->hasMany(UserMessageLimit::class, 'user_id');
+    }
+
+    /**
+     * The current active messages limit
+     *
+     * @return \Illuminate\Database\Eloquent\Model|HasMany|object|null
+     */
+    public function currentMessagesLimit()
+    {
+        return $this->message_limits()->where('status', 'active')->first();
+    }
+
+    /**
+     * Check if the user has available messages
+     *
+     * @param int $messages_number
+     *
+     * @return bool
+     */
+    public function hasAvailableMessages(int $messages_number = 1): bool
+    {
+        $available_messages = $this->currentMessagesLimit()->assigned - $this->currentMessagesLimit()->available;
+
+        return $available_messages >= $messages_number;
+    }
 }
