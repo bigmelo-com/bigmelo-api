@@ -92,6 +92,21 @@ class User extends Authenticatable
     }
 
     /**
+     * Decrease the number of available messages according to the current limit
+     *
+     * @param int $messages_number
+     *
+     * @return void
+     */
+    public function decreaseAvailableMessages(int $messages_number = 1): void
+    {
+        $limit = $this->currentMessagesLimit();
+
+        $limit->available = $limit->available - $messages_number;
+        $limit->save();
+    }
+
+    /**
      * Check if the user has available messages
      *
      * @param int $messages_number

@@ -7,5 +7,8 @@ return [
     'twilio' => [
         'sid'   => env('TWILIO_SID'),
         'token' => env('TWILIO_TOKEN'),
-    ]
+    ],
+    'message' => [
+        'no_available_messages' => 'Ha excedido el límite de mensajes o su límite es cero.'
+    ],
 ];

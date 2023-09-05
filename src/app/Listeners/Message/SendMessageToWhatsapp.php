@@ -24,6 +24,10 @@ class SendMessageToWhatsapp
 
             $twilio_client->sendMessageToWhatsapp($user->full_phone_number, $bigmelo_message->content);
 
+            if ($user->hasAvailableMessages()) {
+                $user->decreaseAvailableMessages();
+            }
+
             Log::info(
                 'Message sent to whatsapp, ' .
                 'message_id: ' . $bigmelo_message->id

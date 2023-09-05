@@ -22,5 +22,10 @@ return [
             'user:store'
         ]
     ],
+    'user' => [
+        'abilities' => [
+            'message:store'
+        ]
+    ],
 
 ];
