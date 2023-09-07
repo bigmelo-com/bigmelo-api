@@ -101,8 +101,11 @@ class User extends Authenticatable
     public function decreaseAvailableMessages(int $messages_number = 1): void
     {
         $limit = $this->currentMessagesLimit();
+        $available_messages = $limit->available - $messages_number;
 
-        $limit->available = $limit->available - $messages_number;
+        $limit->available = $available_messages;
+        $limit->status = $available_messages > 0 ? 'active' : 'inactive';
+
         $limit->save();
     }
 

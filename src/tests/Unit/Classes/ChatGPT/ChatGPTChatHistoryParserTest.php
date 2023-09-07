@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  * Run these specific tests
  * php artisan test tests/Unit/Classes/ChatGPT/ChatGPTChatHistoryParserTest.php
  *
- * @package Tests\Unit\Models
+ * @package Tests\Unit\Classes\ChatGPT
  */
 class ChatGPTChatHistoryParserTest extends TestCase
 {

@@ -4,6 +4,7 @@ namespace App\Listeners\Message;
 
 use App\Classes\ChatGPT\ChatGPTChatHistoryParser;
 use App\Classes\ChatGPT\ChatGPTClient;
+use App\Classes\Message\ChatGPTMessage;
 use App\Events\Message\BigmeloMessageStored;
 use App\Events\Message\UserMessageStored;
 use App\Models\Message;
@@ -39,25 +40,29 @@ class GetChatGPTMessage
                 return;
             }
 
+            // History of messages, context
             $old_messages = ($user->messages()->orderBy('id', 'desc')->limit(20)->get())->toArray();
+
+            // New message wrote by the "user"
             $new_message = $user_message->content;
 
+            // Props to get new ChatGPT message
             $chat_history_parser = new ChatGPTChatHistoryParser($old_messages, $new_message);
+
             $chat = new ChatGPTClient();
 
-            $chatpgt_message = $chat->getMessage($chat_history_parser->getChatHistory());
+            // Get new chatGPT message
+            $chatgpt_message_response = $chat->getMessage($chat_history_parser->getChatHistory());
 
-            $message = Message::create([
-                'user_id' => $user_message->user_id,
-                'content' => $chatpgt_message,
-                'source'  => 'ChatGPT'
-            ]);
+            // Save message as a ChatGPT message
+            $chatgpt_message = new ChatGPTMessage($user->id, $chatgpt_message_response);
+            $chatgpt_message->save();
 
-            event(new BigmeloMessageStored($message));
+            event(new BigmeloMessageStored($chatgpt_message->getMessage()));
 
             Log::info(
                 "Listener: Get ChatGPT Message, " .
-                "message_id: " . $message->id
+                "message_id: " . $chatgpt_message->getMessage()->id
             );
 
         } catch (\Throwable $e) {

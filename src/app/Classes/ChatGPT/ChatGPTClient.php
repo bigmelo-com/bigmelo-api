@@ -2,6 +2,7 @@
 
 namespace App\Classes\ChatGPT;
 
+use App\Classes\Message\ChatGPTMessageResponse;
 use App\Exceptions\ChatGPT\ChatGPTClientCouldNotGetANewMessageException;
 
 class ChatGPTClient
@@ -24,11 +25,11 @@ class ChatGPTClient
      * Get message from ChatGPT Client
      *
      * @param array $messages
-     * @return string
+     * @return ChatGPTMessageResponse
      *
      * @throws ChatGPTClientCouldNotGetANewMessageException
      */
-    public function getMessage(array $messages): string
+    public function getMessage(array $messages): ChatGPTMessageResponse
     {
         try {
             $response = $this->client->chat()->create([
@@ -37,7 +38,16 @@ class ChatGPTClient
             ]);
 
             if (isset($response->choices[0])) {
-                return $response->choices[0]->message->content;
+                return new ChatGPTMessageResponse(
+                    content: $response->choices[0]->message->content,
+                    chatgpt_id: $response->id ?? null,
+                    object_type: $response->object ?? null,
+                    model: $response->model ?? null,
+                    role: $response->choices[0]->message->role ?? null,
+                    prompt_tokens: $response->usage->promptTokens ?? null,
+                    completion_tokens: $response->usage->completionTokens ?? null,
+                    total_tokens: $response->usage->totalTokens ?? null
+                );
             }
 
             throw new ChatGPTClientCouldNotGetANewMessageException(
