@@ -34,6 +34,14 @@ class MessageCollection extends ResourceCollection
                     ];
                 }
 
+                if ($message->whatsapp_message) {
+                    $result['whatsapp_message'] = [
+                        'profile_name'  => $message->whatsapp_message->profile_name,
+                        'from'          => $message->whatsapp_message->from,
+                        'to'            => $message->whatsapp_message->to
+                    ];
+                }
+
                 return $result;
 
             }, $this->all())

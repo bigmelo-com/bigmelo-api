@@ -39,4 +39,12 @@ class Message extends Model
     {
         return $this->hasOne(ChatgptMessage::class, 'message_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne|null
+     */
+    public function whatsapp_message(): ?HasOne
+    {
+        return $this->hasOne(WhatsappMessage::class, 'message_id');
+    }
 }
