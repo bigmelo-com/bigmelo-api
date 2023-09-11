@@ -8,10 +8,28 @@ use App\Classes\Message\ChatGPTMessage;
 use App\Events\Message\BigmeloMessageStored;
 use App\Events\Message\UserMessageStored;
 use App\Models\Message;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class GetChatGPTMessage
+class GetChatGPTMessage implements ShouldQueue
 {
+    use InteractsWithQueue;
+
+    /**
+     * The number of times the queued listener may be attempted.
+     *
+     * @var int
+     */
+    public int $tries = 3;
+
+    /**
+     * The number of seconds before the job should be retried.
+     *
+     * @var int
+     */
+    public int $retryAfter = 10;
+
     /**
      * Handle the event.
      */

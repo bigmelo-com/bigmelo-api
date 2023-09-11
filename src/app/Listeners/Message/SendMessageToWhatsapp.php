@@ -8,8 +8,24 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class SendMessageToWhatsapp
+class SendMessageToWhatsapp implements ShouldQueue
 {
+    use InteractsWithQueue;
+
+    /**
+     * The number of times the queued listener may be attempted.
+     *
+     * @var int
+     */
+    public int $tries = 5;
+
+    /**
+     * The number of seconds before the job should be retried.
+     *
+     * @var int
+     */
+    public int $retryAfter = 10;
+
     /**
      * Handle the event.
      */

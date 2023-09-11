@@ -161,9 +161,7 @@ class MessageController extends Controller
 
             event(new UserMessageStored($message));
 
-            $last_message = Message::latest()->firstOrFail();
-
-            return response()->json(['message' => $last_message->content], 200);
+            return response()->json(['message' => 'Message stored successfully.'], 200);
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
