@@ -58,12 +58,16 @@ class GetChatGPTMessage
             $chatgpt_message = new ChatGPTMessage($user->id, $chatgpt_message_response);
             $chatgpt_message->save();
 
-            event(new BigmeloMessageStored($chatgpt_message->getMessage()));
+            $stored_messages = $chatgpt_message->getMessages();
 
-            Log::info(
-                "Listener: Get ChatGPT Message, " .
-                "message_id: " . $chatgpt_message->getMessage()->id
-            );
+            foreach ($stored_messages as $message) {
+                event(new BigmeloMessageStored($message));
+
+                Log::info(
+                    "Listener: Get ChatGPT Message, " .
+                    "message_id: " . $message->id
+                );
+            }
 
         } catch (\Throwable $e) {
             Log::error(

@@ -100,7 +100,8 @@ class ChatGPTMessageTest extends TestCase
      */
     public function save_new_message_test_content(): void
     {
-        $message = Message::find($this->chat_gpt_message->getMessage()->id);
+        $messages = $this->chat_gpt_message->getMessages();
+        $message = Message::find(end($messages)->id);
 
         $this->assertEquals($this->fields['content'], $message->content);
     }
@@ -110,7 +111,8 @@ class ChatGPTMessageTest extends TestCase
      */
     public function save_new_message_test_data_from_chatgpt(): void
     {
-        $message = Message::find($this->chat_gpt_message->getMessage()->id);
+        $messages = $this->chat_gpt_message->getMessages();
+        $message = Message::find(end($messages)->id);
 
         $this->assertEquals($this->fields['chatgpt_id'], $message->chatgpt_message->chatgpt_id);
         $this->assertEquals($this->fields['object_type'], $message->chatgpt_message->object_type);

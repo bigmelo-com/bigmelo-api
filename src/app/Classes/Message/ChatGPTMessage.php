@@ -18,9 +18,9 @@ class ChatGPTMessage
     private User $user;
 
     /**
-     * @var Message
+     * @var array
      */
-    private Message $message;
+    private array $messages;
 
     /**
      * @param int $user_id
@@ -39,33 +39,40 @@ class ChatGPTMessage
      */
     public function save(): void
     {
-        $this->message = Message::create([
-            'user_id' => $this->user->id,
-            'content' => $this->message_response->getContent(),
-            'source'  => 'ChatGPT'
-        ]);
+        $text = $this->message_response->getContent();
 
-        \App\Models\ChatgptMessage::create([
-            'message_id' => $this->message->id,
-            'chatgpt_id' => $this->message_response->getChatgptID(),
-            'object_type' => $this->message_response->getObjectType(),
-            'model' => $this->message_response->getModel(),
-            'role' => $this->message_response->getRole(),
-            'prompt_tokens' => $this->message_response->getPromptTokens(),
-            'completion_tokens' => $this->message_response->getCompletionTokens(),
-            'total_tokens' => $this->message_response->getTotalTokens()
-        ]);
+        // Split the text into 100-word fragments
+        $fragments = preg_split('/((?:\S+\s*){1,120})/', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
-        $this->message->refresh();
+        foreach ($fragments as $fragment) {
+            $message = Message::create([
+                'user_id' => $this->user->id,
+                'content' => $fragment,
+                'source' => 'ChatGPT'
+            ]);
+
+            \App\Models\ChatgptMessage::create([
+                'message_id' => $message->id,
+                'chatgpt_id' => $this->message_response->getChatgptID(),
+                'object_type' => $this->message_response->getObjectType(),
+                'model' => $this->message_response->getModel(),
+                'role' => $this->message_response->getRole(),
+                'prompt_tokens' => $this->message_response->getPromptTokens(),
+                'completion_tokens' => $this->message_response->getCompletionTokens(),
+                'total_tokens' => $this->message_response->getTotalTokens()
+            ]);
+
+            $this->messages[] = $message;
+        }
     }
 
     /**
      * Return the message stored
      *
-     * @return Message
+     * @return array
      */
-    public function getMessage(): Message
+    public function getMessages(): array
     {
-        return $this->message;
+        return $this->messages;
     }
 }
