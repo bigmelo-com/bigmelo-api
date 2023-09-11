@@ -42,7 +42,7 @@ class ChatGPTMessage
         $text = $this->message_response->getContent();
 
         // Split the text into 100-word fragments
-        $fragments = preg_split('/((?:\S+\s*){1,120})/', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $fragments = preg_split('/((?:\S+\s*){1,100})/', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         foreach ($fragments as $fragment) {
             $message = Message::create([
