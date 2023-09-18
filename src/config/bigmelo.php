@@ -9,6 +9,7 @@ return [
         'token' => env('TWILIO_TOKEN'),
     ],
     'message' => [
-        'no_available_messages' => 'Ha excedido el límite de mensajes o su límite es cero.'
+        'no_available_messages' => 'Ha excedido el límite de mensajes o su límite es cero.',
+        'wrong_media_type'      => 'El archivo adjunto no se puede procesar'
     ],
 ];

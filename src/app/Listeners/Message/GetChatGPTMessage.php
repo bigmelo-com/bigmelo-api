@@ -58,6 +58,25 @@ class GetChatGPTMessage implements ShouldQueue
                 return;
             }
 
+            if ($user_message->source == 'WhatsApp' && $user_message->chatgpt_message->media_content_type != null) {
+
+                $message = Message::create([
+                    'user_id' => $user_message->user_id,
+                    'content' => config('bigmelo.message.wrong_media_type'),
+                    'source'  => 'Admin'
+                ]);
+
+                event(new BigmeloMessageStored($message));
+
+                Log::info(
+                    "Listener: Get ChatGPT Message, " .
+                    "issue: Wrong media type sent from WhatsApp, " .
+                    "message_id: " . $message->id
+                );
+
+                return;
+            }
+
             // History of messages, context
             $old_messages = ($user->messages()->orderBy('id', 'desc')->limit(20)->get())->toArray();
 
