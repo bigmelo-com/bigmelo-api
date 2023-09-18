@@ -58,7 +58,7 @@ class GetChatGPTMessage implements ShouldQueue
                 return;
             }
 
-            if ($user_message->source == 'WhatsApp' && $user_message->chatgpt_message->media_content_type != null) {
+            if ($user_message->source == 'WhatsApp' && $user_message->whatsapp_message->media_content_type != null) {
 
                 $message = Message::create([
                     'user_id' => $user_message->user_id,
