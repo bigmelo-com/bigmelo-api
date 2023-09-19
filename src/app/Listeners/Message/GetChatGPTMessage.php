@@ -59,7 +59,6 @@ class GetChatGPTMessage implements ShouldQueue
             }
 
             if ($user_message->source == 'WhatsApp' && $user_message->whatsapp_message->media_content_type != null) {
-
                 $message = Message::create([
                     'user_id' => $user_message->user_id,
                     'content' => config('bigmelo.message.wrong_media_type'),
@@ -73,8 +72,6 @@ class GetChatGPTMessage implements ShouldQueue
                     "issue: Wrong media type sent from WhatsApp, " .
                     "message_id: " . $message->id
                 );
-
-                return;
             }
 
             // History of messages, context
