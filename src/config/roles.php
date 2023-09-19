@@ -19,7 +19,8 @@ return [
             'message:get',
             'message:store',
             'chats:get',
-            'user:store'
+            'user:store',
+            'project:store'
         ]
     ],
     'user' => [
