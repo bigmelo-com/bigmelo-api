@@ -20,6 +20,7 @@ class Project extends Model
         'name',
         'description',
         'system_prompt',
+        'phone_number',
         'active'
     ];
 

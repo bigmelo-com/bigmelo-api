@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->text('system_prompt')->nullable();
+            $table->string('phone_number', 20)->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
