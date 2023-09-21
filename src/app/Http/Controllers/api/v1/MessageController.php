@@ -148,11 +148,13 @@ class MessageController extends Controller
         try {
             $lead_id = $request->lead_id ?? $request->user()->lead->id;
             $source  = $request->source;
+            $project_id = $request->project_id;
 
             $message = Message::create([
-                'lead_id' => $lead_id,
-                'content' => $request->message,
-                'source'  => $source
+                'lead_id'       => $lead_id,
+                'project_id'    => $project_id,
+                'content'       => $request->message,
+                'source'        => $source
             ]);
 
             if ($message->source == 'Admin') {

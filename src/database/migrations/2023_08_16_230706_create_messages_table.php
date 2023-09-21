@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('lead_id')->nullable();
+            $table->unsignedBigInteger('project_id')->nullable();
             $table->text('content')->nullable();
             $table->string('source')->default('');
             $table->timestamps();

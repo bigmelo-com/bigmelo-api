@@ -18,6 +18,7 @@ class Message extends Model
      */
     protected $fillable = [
         'lead_id',
+        'project_id',
         'content',
         'source'
     ];
@@ -30,6 +31,16 @@ class Message extends Model
     public function lead(): BelongsTo
     {
         return $this->belongsTo(Lead::class, 'lead_id', 'id');
+    }
+
+    /**
+     * Project related to the message
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id', 'id');
     }
 
     /**

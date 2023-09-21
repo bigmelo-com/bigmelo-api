@@ -39,12 +39,14 @@ class GetChatGPTMessage implements ShouldQueue
     {
         $lead_message = $event->message;
         $lead = $lead_message->lead;
+        $project = $lead_message->project;
 
         try {
 
             if ($lead_message->source == 'WhatsApp' && $lead_message->whatsapp_message->media_content_type != null) {
                 $message = Message::create([
-                    'user_id' => $lead_message->lead_id,
+                    'lead_id' => $lead_message->lead_id,
+                    'project_id' => $lead_message->project_id,
                     'content' => config('bigmelo.message.wrong_media_type'),
                     'source'  => 'Admin'
                 ]);
@@ -99,7 +101,7 @@ class GetChatGPTMessage implements ShouldQueue
             $chatgpt_message_response = $chat->getMessage($chat_history_parser->getChatHistory());
 
             // Save message as a ChatGPT message
-            $chatgpt_message = new ChatGPTMessage($lead->id, $chatgpt_message_response);
+            $chatgpt_message = new ChatGPTMessage($lead, $project, $chatgpt_message_response);
             $chatgpt_message->save();
 
             $stored_messages = $chatgpt_message->getMessages();
