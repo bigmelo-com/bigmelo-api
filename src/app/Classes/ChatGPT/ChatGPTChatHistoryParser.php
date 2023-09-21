@@ -32,11 +32,12 @@ class ChatGPTChatHistoryParser
      */
     public function __construct(array $message_history, string $new_message, string $system_message = null)
     {
+        $this->setMessageHistory($message_history);
+
         if ($system_message) {
             $this->messages[] = ['role' => 'system', 'content' => $system_message];
         }
 
-        $this->setMessageHistory($message_history);
         $this->messages[] = ['role' => 'user', 'content' => $new_message];
     }
 
