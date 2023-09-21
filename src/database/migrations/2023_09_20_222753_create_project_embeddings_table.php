@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->text('text');
-            $table->vector('embedding', 2000);
+            $table->vector('embedding', 1536);
             $table->timestamps();
         });
     }

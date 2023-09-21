@@ -101,9 +101,9 @@ class GetChatGPTMessage implements ShouldQueue
                 $system_content .= "\n" . $source->text;
             }
 
-            $system_content .= "\n```\n\nThe user will ask you about things about he as a consumer and
-            you should reply in a concise way. Always reply in Spanish language. If you consider that the answer is not
-            in the previous text, or is not a issue as consumer, you have to answer with
+            $system_content .= "\n```\n\nThe user will ask you about things about he as a consumer according to the
+            previous text and you should reply in a concise way. Always reply in Spanish language. If you consider that
+            the answer is not in the previous text or about a different topic, or is not a issue as consumer, you have to answer with
             'Estoy aqui solo para resolver tus dudas como consumidor'";
 
             // ---------------------------------------------------------------------------------------------------
