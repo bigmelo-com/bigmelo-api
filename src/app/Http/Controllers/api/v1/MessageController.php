@@ -146,7 +146,7 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request): JsonResponse
     {
         try {
-            $lead_id = $request->lead_id ?? $request->user()->lead()->id;
+            $lead_id = $request->lead_id ?? $request->user()->lead->id;
             $source  = $request->source;
 
             $message = Message::create([
@@ -165,6 +165,7 @@ class MessageController extends Controller
             return response()->json(['message' => 'Message stored successfully.'], 200);
 
         } catch (\Throwable $e) {
+            throw $e;
             return response()->json(['message' => $e->getMessage()], 500);
 
         }

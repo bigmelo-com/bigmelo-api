@@ -2,6 +2,7 @@
 
 namespace App\Classes\Message;
 
+use App\Models\Lead;
 use App\Models\Message;
 use App\Models\User;
 
@@ -13,9 +14,9 @@ class ChatGPTMessage
     private ChatGPTMessageResponse $message_response;
 
     /**
-     * @var User
+     * @var Lead
      */
-    private User $user;
+    private Lead $lead;
 
     /**
      * @var array
@@ -23,12 +24,12 @@ class ChatGPTMessage
     private array $messages;
 
     /**
-     * @param int $user_id
+     * @param int $lead_id
      * @param ChatGPTMessageResponse $message_response
      */
-    public function __construct(int $user_id, ChatGPTMessageResponse $message_response)
+    public function __construct(int $lead_id, ChatGPTMessageResponse $message_response)
     {
-        $this->user = User::find($user_id);
+        $this->lead = Lead::find($lead_id);
         $this->message_response = $message_response;
     }
 
@@ -46,7 +47,7 @@ class ChatGPTMessage
 
         foreach ($fragments as $fragment) {
             $message = Message::create([
-                'user_id' => $this->user->id,
+                'lead_id' => $this->lead->id,
                 'content' => $fragment,
                 'source' => 'ChatGPT'
             ]);

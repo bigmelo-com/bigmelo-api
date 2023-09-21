@@ -61,7 +61,9 @@ class GetChatGPTMessage implements ShouldQueue
             $chat = new ChatGPTClient();
 
             // History of messages, context
-            $old_messages = ($lead->messages()->orderBy('id', 'desc')->limit(5)->get())->toArray();
+            $old_messages = (
+                $lead->messages()->where('source', 'ChatGPT')->orderBy('id', 'desc'
+                )->limit(5)->get())->toArray();
 
             // New message wrote by the "user"
             $new_message = $lead_message->content;

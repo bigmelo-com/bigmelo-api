@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\api\v1;
 
+use App\Models\Lead;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
@@ -50,28 +51,48 @@ class ChatControllerTest extends TestApi
             'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
         ]);
 
+        $lead1 = Lead::create([
+            'user_id'           => $user1->id,
+            'first_name'        => $user1->name,
+            'last_name'         => $user1->last_name,
+            'email'             => $user1->email,
+            'country_code'      => $user1->country_code,
+            'phone_number'      => $user1->phone_number,
+            'full_phone_number' => $user1->full_phone_number,
+        ]);
+
+        $lead2 = Lead::create([
+            'user_id'           => $user2->id,
+            'first_name'        => $user2->name,
+            'last_name'         => $user2->last_name,
+            'email'             => $user2->email,
+            'country_code'      => $user2->country_code,
+            'phone_number'      => $user2->phone_number,
+            'full_phone_number' => $user2->full_phone_number,
+        ]);
+
         $message1 = Message::create([
-            'user_id' => $user1->id,
+            'lead_id' => $lead1->id,
             'content' => $this->faker->text(300),
             'source'  => 'API'
         ]);
         $message2 = Message::create([
-            'user_id' => $user1->id,
+            'lead_id' => $lead1->id,
             'content' => $this->faker->text(300),
             'source'  => 'ChatGPT'
         ]);
         $message3 = Message::create([
-            'user_id' => $user1->id,
+            'lead_id' => $lead1->id,
             'content' => $this->faker->text(300),
             'source'  => 'WhatsApp'
         ]);
         $message4 = Message::create([
-            'user_id' => $user1->id,
+            'lead_id' => $lead1->id,
             'content' => $this->faker->text(300),
             'source'  => 'ChatGPT'
         ]);
         $message5 = Message::create([
-            'user_id' => $user2->id,
+            'lead_id' => $lead2->id,
             'content' => $this->faker->text(300),
             'source'  => 'Admin'
         ]);
