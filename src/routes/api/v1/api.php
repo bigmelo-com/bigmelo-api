@@ -36,4 +36,8 @@ Route::prefix('/user')->group(function() {
 
 Route::prefix('/project')->group(function() {
     Route::post('', 'App\Http\Controllers\api\v1\ProjectController@store')->middleware(['auth:sanctum', 'abilities:project:store']);
+
+    Route::prefix('/{project_id}')->group(function() {
+        Route::post('/embeddings', 'App\Http\Controllers\api\v1\ProjectEmbeddingController@store')->middleware(['auth:sanctum', 'abilities:project:store']);
+    });
 });

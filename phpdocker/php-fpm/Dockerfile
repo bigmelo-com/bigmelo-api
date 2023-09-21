@@ -17,8 +17,9 @@ RUN apt-get update; \
         php8.1-ldap \ 
         php8.1-memcached \ 
         php8.1-mongodb \ 
-        php8.1-mysql \ 
-        php8.1-odbc \ 
+        php8.1-mysql \
+        php8.1-pgsql \
+        php8.1-odbc \
         php8.1-phpdbg \ 
         php8.1-pspell \ 
         php8.1-redis \ 

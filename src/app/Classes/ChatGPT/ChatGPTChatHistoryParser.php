@@ -26,11 +26,16 @@ class ChatGPTChatHistoryParser
      *
      * @param array $message_history
      * @param string $new_message
+     * @param string|null $system_message
      *
      * @throws ChatGPTChatHistoryParserWrongMessageHistoryDataException
      */
-    public function __construct(array $message_history, string $new_message)
+    public function __construct(array $message_history, string $new_message, string $system_message = null)
     {
+        if ($system_message) {
+            $this->messages[] = ['role' => 'system', 'content' => $system_message];
+        }
+
         $this->setMessageHistory($message_history);
         $this->messages[] = ['role' => 'user', 'content' => $new_message];
     }
