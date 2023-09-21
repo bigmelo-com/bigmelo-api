@@ -14,11 +14,16 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'organization_id'   => 'required|numeric|exists:organizations,id',
-            'name'              => 'required|string|max:255',
-            'description'       => 'nullable|string|max:500',
-            'system_prompt'     => 'nullable|string|max:500',
-            'phone_number'      => 'required|regex:/^\+[0-9]+$/|min:10|max:20',
+            'organization_id'           => 'required|numeric|exists:organizations,id',
+            'name'                      => 'required|string|max:255',
+            'description'               => 'nullable|string|max:500',
+            'phone_number'              => 'required|regex:/^\+[0-9]+$/|min:10|max:20',
+            'assistant_description'     => 'required|string|min:20',
+            'assistant_goal'            => 'required|string|min:20',
+            'assistant_knowledge_about' => 'required|string|min:20',
+            'target_public'             => 'required|string|min:20',
+            'language'                  => 'required|string|max:20',
+            'default_answer'            => 'required|string|min:20'
         ];
     }
 }

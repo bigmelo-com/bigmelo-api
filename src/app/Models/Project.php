@@ -20,8 +20,14 @@ class Project extends Model
         'organization_id',
         'name',
         'description',
-        'system_prompt',
         'phone_number',
+        'assistant_description',
+        'assistant_goal',
+        'assistant_knowledge_about',
+        'target_public',
+        'language',
+        'default_answer',
+        'has_system_prompt',
         'active'
     ];
 

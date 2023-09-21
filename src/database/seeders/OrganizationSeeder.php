@@ -33,10 +33,15 @@ class OrganizationSeeder extends Seeder
 
             if ($organization->projects->count() === 0) {
                 $project = Project::create([
-                    'organization_id'   => $organization->id,
-                    'name'              => 'Bigmelo',
-                    'description'       => 'Project base.',
-                    'phone_number'      => '+14155238886',
+                    'organization_id'       => $organization->id,
+                    'name'                  => 'Bigmelo',
+                    'description'           => 'Project base.',
+                    'phone_number'          => '+14155238886',
+                    'assistant_description' => 'a nice Bigmelo chatbot powering by AI',
+                    'assistant_goal'        => 'to help all people to answer their questions and doubts',
+                    'language'              => 'Spanish',
+                    'default_answer'        => 'https://bigmelo.com',
+                    'has_system_prompt'     => false
                 ]);
 
                 $user->lead->projects()->attach($project);

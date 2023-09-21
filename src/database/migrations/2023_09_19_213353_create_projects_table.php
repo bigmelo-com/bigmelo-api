@@ -16,8 +16,14 @@ return new class extends Migration
             $table->unsignedBigInteger('organization_id');
             $table->string('name')->nullable();
             $table->text('description')->nullable();
-            $table->text('system_prompt')->nullable();
             $table->string('phone_number', 20)->nullable();
+            $table->text('assistant_description')->nullable();
+            $table->text('assistant_goal')->nullable();
+            $table->text('assistant_knowledge_about')->nullable();
+            $table->text('target_public')->nullable();
+            $table->string('language', 20)->nullable();
+            $table->text('default_answer')->nullable();
+            $table->boolean('has_system_prompt')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
         });

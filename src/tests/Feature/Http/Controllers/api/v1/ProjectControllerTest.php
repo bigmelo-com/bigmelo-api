@@ -27,11 +27,16 @@ class ProjectControllerTest extends TestApi
     public function admin_can_store_a_new_project(): void
     {
         $project_data = [
-            'organization_id'   => 1,
-            'name'              => $this->faker->name,
-            'description'       => $this->faker->text(200),
-            'system_prompt'     => $this->faker->text(100),
-            'phone_number'      => $this->faker->numerify('+############')
+            'organization_id'           => 1,
+            'name'                      => $this->faker->name,
+            'description'               => $this->faker->text(200),
+            'phone_number'              => $this->faker->numerify('+############'),
+            'assistant_description'     => $this->faker->text(200),
+            'assistant_goal'            => $this->faker->text(200),
+            'assistant_knowledge_about' => $this->faker->text(200),
+            'target_public'             => $this->faker->text(200),
+            'language'                  => $this->faker->word(),
+            'default_answer'            => $this->faker->text(200),
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
@@ -46,8 +51,9 @@ class ProjectControllerTest extends TestApi
         $this->assertEquals($project_data['organization_id'], $new_project->organization_id);
         $this->assertEquals($project_data['name'], $new_project->name);
         $this->assertEquals($project_data['description'], $new_project->description);
-        $this->assertEquals($project_data['system_prompt'], $new_project->system_prompt);
         $this->assertEquals($project_data['phone_number'], $new_project->phone_number);
+        $this->assertEquals($project_data['language'], $new_project->language);
+        $this->assertTrue((boolean)$new_project->has_system_prompt);
     }
 
     /**

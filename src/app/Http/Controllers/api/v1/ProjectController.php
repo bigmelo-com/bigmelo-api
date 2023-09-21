@@ -27,7 +27,10 @@ class ProjectController extends Controller
      *         @OA\MediaType(
      *             mediaType="application/json",
      *             @OA\Schema(
-     *                 required={"organization_id", "name", "phone_number"},
+     *                 required={
+     *                      "organization_id", "name", "phone_number", "assistant_description", "assistant_goal",
+     *                      "assistant_knowledge_about", "target_public", "language", "default_answer"
+     *                  },
      *                 @OA\Property(
      *                     property="organization_id",
      *                     type="integer"
@@ -41,19 +44,44 @@ class ProjectController extends Controller
      *                     type="string"
      *                 ),
      *                 @OA\Property(
-     *                     property="system_prompt",
+     *                     property="phone_number",
      *                     type="string"
      *                 ),
      *                 @OA\Property(
-     *                     property="phone_number",
+     *                     property="assistant_description",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="assistant_goal",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="assistant_knowledge_about",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="target_public",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="language",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="default_answer",
      *                     type="string"
      *                 ),
      *                 example={
      *                     "organization_id": 1,
      *                     "name": "Bigmelo",
      *                     "description": "New big organization.",
-     *                     "system_prompt": "This is an assistant for the Bigmelo clients.",
-     *                     "phone_number": "+573121234567"
+     *                     "phone_number": "+573121234567",
+     *                     "assistant_description": "an official of the Superintendency of Industry and Commerce",
+     *                     "assistant_goal": "to advise citizens on their consumer concerns",
+     *                     "assistant_knowledge_about": "consumer rights and consumer duties",
+     *                     "target_public": "a colombian consumer",
+     *                     "language": "Spanish",
+     *                     "target_public": "Estoy aqui solo para resolver tus dudas como consumidor"
      *                  }
      *             )
      *         )
@@ -81,12 +109,23 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request): JsonResponse
     {
         try {
+            $project = Project::where('phone_number', $request->phone_number)->first();
+
+            if ($project) {
+                return response()->json(['message' => 'phone_number already exist in another project.'], 422);
+            }
+
             $project = Project::create([
-                'organization_id'   => $request->organization_id,
-                'name'              => $request->name,
-                'description'       => $request->description ?? '',
-                'system_prompt'     => $request->system_prompt ?? '',
-                'phone_number'      => $request->phone_number,
+                'organization_id'           => $request->organization_id,
+                'name'                      => $request->name,
+                'description'               => $request->description ?? '',
+                'phone_number'              => $request->phone_number,
+                'assistant_description'     => $request->assistant_description ?? '',
+                'assistant_goal'            => $request->assistant_goal ?? '',
+                'assistant_knowledge_about' => $request->assistant_knowledge_about ?? '',
+                'target_public'             => $request->target_public ?? '',
+                'language'                  => $request->language ?? '',
+                'default_answer'            => $request->default_answer ?? '',
             ]);
 
             return response()->json(
