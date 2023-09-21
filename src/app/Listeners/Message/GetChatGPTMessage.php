@@ -37,32 +37,14 @@ class GetChatGPTMessage implements ShouldQueue
      */
     public function handle(UserMessageStored $event): void
     {
-        $user_message = $event->message;
-        $user = $user_message->user;
+        $lead_message = $event->message;
+        $lead = $lead_message->lead;
 
         try {
 
-            if (!$user->hasAvailableMessages()) {
+            if ($lead_message->source == 'WhatsApp' && $lead_message->whatsapp_message->media_content_type != null) {
                 $message = Message::create([
-                    'user_id' => $user_message->user_id,
-                    'content' => config('bigmelo.message.no_available_messages'),
-                    'source'  => 'Admin'
-                ]);
-
-                event(new BigmeloMessageStored($message));
-
-                Log::info(
-                    "Listener: Get ChatGPT Message, " .
-                    "issue: Messages limit exceeded for the user, " .
-                    "message_id: " . $message->id
-                );
-
-                return;
-            }
-
-            if ($user_message->source == 'WhatsApp' && $user_message->whatsapp_message->media_content_type != null) {
-                $message = Message::create([
-                    'user_id' => $user_message->user_id,
+                    'user_id' => $lead_message->lead_id,
                     'content' => config('bigmelo.message.wrong_media_type'),
                     'source'  => 'Admin'
                 ]);
@@ -79,10 +61,10 @@ class GetChatGPTMessage implements ShouldQueue
             $chat = new ChatGPTClient();
 
             // History of messages, context
-            $old_messages = ($user->messages()->orderBy('id', 'desc')->limit(5)->get())->toArray();
+            $old_messages = ($lead->messages()->orderBy('id', 'desc')->limit(5)->get())->toArray();
 
             // New message wrote by the "user"
-            $new_message = $user_message->content;
+            $new_message = $lead_message->content;
 
             // ---------------------------------------------------------------------------------------------------
             // Code to get similarities by embedding
@@ -115,7 +97,7 @@ class GetChatGPTMessage implements ShouldQueue
             $chatgpt_message_response = $chat->getMessage($chat_history_parser->getChatHistory());
 
             // Save message as a ChatGPT message
-            $chatgpt_message = new ChatGPTMessage($user->id, $chatgpt_message_response);
+            $chatgpt_message = new ChatGPTMessage($lead->id, $chatgpt_message_response);
             $chatgpt_message->save();
 
             $stored_messages = $chatgpt_message->getMessages();
@@ -132,7 +114,7 @@ class GetChatGPTMessage implements ShouldQueue
         } catch (\Throwable $e) {
             Log::error(
                 'GetChatGPTMessage: Internal error, ' .
-                'user_message_id: ' . $user_message->id . ', ' .
+                'user_message_id: ' . $lead_message->id . ', ' .
                 'error: ' . $e->getMessage()
             );
         }

@@ -19,7 +19,7 @@ class MessageCollection extends ResourceCollection
 
                 $result = [
                     'id'            => $message->id,
-                    'user_id'       => $message->user_id,
+                    'lead_id'       => $message->lead_id,
                     'content'       => $message->content,
                     'source'        => $message->source,
                     'created_at'    => $message->created_at,

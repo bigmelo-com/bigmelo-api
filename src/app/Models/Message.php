@@ -17,19 +17,19 @@ class Message extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
+        'lead_id',
         'content',
         'source'
     ];
 
     /**
-     * User related to the message
+     * Lead related to the message
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function lead(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(Lead::class, 'lead_id', 'id');
     }
 
     /**

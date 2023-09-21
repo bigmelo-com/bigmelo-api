@@ -32,7 +32,7 @@ class MessageControllerTest extends TestApi
         $message_data = [
             'message' => $this->faker->text(300),
             'source'  => 'API',
-            'user_id' => 1
+            'lead_id' => 1
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
@@ -68,7 +68,7 @@ class MessageControllerTest extends TestApi
         $message_data = [
             'message' => $this->faker->text(300),
             'source'  => 'Admin',
-            'user_id' => 1
+            'lead_id' => 1
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
@@ -86,28 +86,28 @@ class MessageControllerTest extends TestApi
     public function admin_can_list_all_message_by_user_id(): void
     {
         $message1 = Message::create([
-            'user_id' => 1,
+            'lead_id' => 1,
             'content' => $this->faker->text(300),
             'source'  => 'API'
         ]);
         $message2 = Message::create([
-            'user_id' => 1,
+            'lead_id' => 1,
             'content' => $this->faker->text(300),
             'source'  => 'ChatGPT'
         ]);
         $message3 = Message::create([
-            'user_id' => 1,
+            'lead_id' => 1,
             'content' => $this->faker->text(300),
             'source'  => 'API'
         ]);
         $message4 = Message::create([
-            'user_id' => 2,
+            'lead_id' => 2,
             'content' => $this->faker->text(300),
             'source'  => 'ChatGPT'
         ]);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
-            ->json('GET', self::ENDPOINT_MESSAGE . '?user_id=1');
+            ->json('GET', self::ENDPOINT_MESSAGE . '?lead_id=1');
 
         $response_data = json_decode($response->getContent())->data;
 

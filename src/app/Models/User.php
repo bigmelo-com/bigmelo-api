@@ -85,16 +85,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Messages related to the specific user
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function messages(): HasMany
-    {
-        return $this->hasMany(Message::class, 'user_id');
-    }
-
-    /**
      * Messages limits related to the specific user
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

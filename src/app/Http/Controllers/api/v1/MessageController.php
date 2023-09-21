@@ -7,6 +7,7 @@ use App\Events\Message\UserMessageStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageCollection;
+use App\Models\Lead;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -62,19 +63,19 @@ class MessageController extends Controller
         try {
             $filters = $request->input();
 
-            $user_id = $filters['user_id'] ?? null;
+            $lead_id = $filters['lead_id'] ?? null;
 
-            if (!$user_id) {
-                return response()->json(['message' => 'Missing parameter: user_id'], 400);
+            if (!$lead_id) {
+                return response()->json(['message' => 'Missing parameter: lead_id'], 400);
             }
 
-            $user = User::find($user_id);
+            $lead = Lead::find($lead_id);
 
-            if (!$user) {
-                return response()->json(['message' => 'User not found'], 404);
+            if (!$lead) {
+                return response()->json(['message' => 'Lead not found'], 404);
             }
 
-            $messages = $user->messages()->orderBy('id', 'desc')->paginate(10);
+            $messages = $lead->messages()->orderBy('id', 'desc')->paginate(10);
 
             return (new MessageCollection($messages))->response()->setStatusCode(200);
 
@@ -145,11 +146,11 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request): JsonResponse
     {
         try {
-            $user_id = $request->user_id ?? $request->user()->id;
+            $lead_id = $request->lead_id ?? $request->user()->lead()->id;
             $source  = $request->source;
 
             $message = Message::create([
-                'user_id' => $user_id,
+                'lead_id' => $lead_id,
                 'content' => $request->message,
                 'source'  => $source
             ]);

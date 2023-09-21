@@ -17,7 +17,7 @@ class StoreMessageRequest extends FormRequest
         return [
             'message'   => 'required|string',
             'source'    => 'required|string|in:Admin,API',
-            'user_id'   => 'required_if:source,Admin|numeric|exists:users,id'
+            'lead_id'   => 'required_if:source,Admin|numeric|exists:leads,id'
         ];
     }
 }
