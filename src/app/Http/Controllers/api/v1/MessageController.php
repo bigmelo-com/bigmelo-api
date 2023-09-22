@@ -150,6 +150,14 @@ class MessageController extends Controller
             $source  = $request->source;
             $project_id = $request->project_id;
 
+            $lead = Lead::find($lead_id);
+
+            $project = $lead->projects->where('id', $project_id)->first();
+
+            if (!$project) {
+                return response()->json(['message' => 'The lead is not in that project.'], 422);
+            }
+
             $message = Message::create([
                 'lead_id'       => $lead_id,
                 'project_id'    => $project_id,
@@ -167,7 +175,6 @@ class MessageController extends Controller
             return response()->json(['message' => 'Message stored successfully.'], 200);
 
         } catch (\Throwable $e) {
-            throw $e;
             return response()->json(['message' => $e->getMessage()], 500);
 
         }

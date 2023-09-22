@@ -43,6 +43,32 @@ class UserSeeder extends Seeder
                 ]);
             }
 
+            $user = User::find(2);
+
+            if (!$user) {
+                $user = User::create([
+                    'role'              => 'admin',
+                    'name'              => 'Abel',
+                    'email'             => 'moreno.abel@gmail.com',
+                    'country_code'      => '+57',
+                    'phone_number'      => '3133929826',
+                    'full_phone_number' => '+573133929826',
+                    'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+                ]);
+            }
+
+            if (!$user->lead) {
+                $lead = Lead::create([
+                    'user_id'           => $user->id,
+                    'first_name'        => $user->name,
+                    'last_name'         => $user->last_name,
+                    'email'             => $user->email,
+                    'country_code'      => $user->country_code,
+                    'phone_number'      => $user->phone_number,
+                    'full_phone_number' => $user->full_phone_number,
+                ]);
+            }
+
         } catch (\Throwable $e) {
             Log::info(get_class() . $e->getMessage());
         }

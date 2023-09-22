@@ -3,16 +3,15 @@
 namespace App\Listeners\Message;
 
 use App\Classes\ChatGPT\ChatGPTChatHistoryParser;
+use App\Classes\ChatGPT\ChatGPTChatPromptBuilder;
 use App\Classes\ChatGPT\ChatGPTClient;
 use App\Classes\Message\ChatGPTMessage;
 use App\Events\Message\BigmeloMessageStored;
 use App\Events\Message\UserMessageStored;
 use App\Models\Message;
-use App\Models\ProjectEmbedding;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
-use Pgvector\Laravel\Vector;
 
 class GetChatGPTMessage implements ShouldQueue
 {
@@ -62,43 +61,11 @@ class GetChatGPTMessage implements ShouldQueue
 
             $chat = new ChatGPTClient();
 
-            // History of messages, context
-            $old_messages = (
-                $lead->messages()->where('source', 'ChatGPT')->orderBy('id', 'desc'
-                )->limit(5)->get())->toArray();
-
-            // New message wrote by the "user"
-            $new_message = $lead_message->content;
-
-            // ---------------------------------------------------------------------------------------------------
-            // Code to get similarities by embedding
-
-            $new_message_vector = new Vector($chat->getEmbedding($new_message));
-            $possible_text_source = ProjectEmbedding::orderByRaw('embedding <-> ?', [$new_message_vector])->take(5)->get();
-            $text_source = [];
-
-            $system_content = "You are an official of the Superintendency of Industry and Commerce who seeks to advise
-            citizens on their consumer concerns. You obtain your knowledge about consumer rights and duties from the
-            following information delimited between three ticks";
-
-            $system_content .= "\n\n```";
-
-            foreach ($possible_text_source as $source) {
-                $system_content .= "\n" . $source->text;
-            }
-
-            $system_content .= "\n```\n\nThe user will ask you about things about he as a consumer according to the
-            previous text and you should reply in a concise way. Always reply in Spanish language. If you consider that
-            the answer is not in the previous text or about a different topic, or is not a issue as consumer, you have to answer with
-            'Estoy aqui solo para resolver tus dudas como consumidor'";
-
-            // ---------------------------------------------------------------------------------------------------
-
-            // Props to get new ChatGPT message
-            $chat_history_parser = new ChatGPTChatHistoryParser($old_messages, $new_message, $system_content);
+            // Prompt to get new ChatGPT message
+            $chat_history_builder = new ChatGPTChatPromptBuilder($lead_message);
 
             // Get new chatGPT message
-            $chatgpt_message_response = $chat->getMessage($chat_history_parser->getChatHistory());
+            $chatgpt_message_response = $chat->getMessage($chat_history_builder->getChatPrompt());
 
             // Save message as a ChatGPT message
             $chatgpt_message = new ChatGPTMessage($lead, $project, $chatgpt_message_response);
