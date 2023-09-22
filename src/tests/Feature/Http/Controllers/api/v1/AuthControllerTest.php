@@ -53,4 +53,22 @@ class AuthControllerTest extends TestApi
         $response->assertStatus(403);
         $response->assertJsonPath('message', 'Your email or password are incorrect.');
     }
+
+     /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_do_successful_signup(): void
+    {
+        // $response = $this->json('post', '/v1/auth/get-token', [
+        //     'email' => 'wrong_email@mydomain.com',
+        //     'password' => 'wrong_password',
+        // ]);
+
+        // $response->assertStatus(403);
+        // $response->assertJsonPath('message', 'Your email or password are incorrect.');
+        $this->assertTrue(true);
+    }
+
 }

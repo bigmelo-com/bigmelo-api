@@ -84,4 +84,9 @@ class AuthController extends Controller
             return response()->json(['message' => 'Your email or password are incorrect.'], 403);
         }
     }
+    public function signUp(Request $request): JsonResponse {
+
+        return response()->json(['message' => 'Invalid name'], 500);
+        
+    }
 }
