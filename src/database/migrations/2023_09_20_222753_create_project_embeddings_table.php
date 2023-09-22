@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('project_embeddings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('lead_id')->nullable();
-            $table->unsignedBigInteger('project_id')->nullable();
-            $table->text('content')->nullable();
-            $table->string('source')->default('');
+            $table->unsignedBigInteger('project_id');
+            $table->text('text');
+            $table->vector('embedding', 1536);
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('project_embeddings');
     }
 };

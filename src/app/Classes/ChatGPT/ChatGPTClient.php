@@ -64,4 +64,39 @@ class ChatGPTClient
         }
     }
 
+    /**
+     * Get embeddings from OpenAI API
+     *
+     * @param string $text
+     *
+     * @return array
+     *
+     * @throws ChatGPTClientCouldNotGetANewMessageException
+     */
+    public function getEmbedding(string $text): array
+    {
+        try {
+            $response = $this->client->embeddings()->create([
+                'model' => 'text-embedding-ada-002',
+                'input' => $text,
+            ]);
+
+            if (isset($response->embeddings[0])) {
+                return $response->embeddings[0]->embedding;
+            }
+
+            throw new ChatGPTClientCouldNotGetANewMessageException(
+                'Error ChatGPT Client: Getting embedding ' .
+                'error: Wrong format in the response object from chatGPT. ' .
+                'response: ' . json_encode($response)
+            );
+
+        } catch (\Throwable $e) {
+            throw new ChatGPTClientCouldNotGetANewMessageException(
+                'Error ChatGPT Client: Getting embedding, ' .
+                'error: ' . $e->getMessage()
+            );
+        }
+    }
+
 }

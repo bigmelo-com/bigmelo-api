@@ -2,7 +2,9 @@
 
 namespace App\Classes\Message;
 
+use App\Models\Lead;
 use App\Models\Message;
+use App\Models\Project;
 use App\Models\User;
 
 class ChatGPTMessage
@@ -13,9 +15,14 @@ class ChatGPTMessage
     private ChatGPTMessageResponse $message_response;
 
     /**
-     * @var User
+     * @var Lead
      */
-    private User $user;
+    private Lead $lead;
+
+    /**
+     * @var Project
+     */
+    private Project $project;
 
     /**
      * @var array
@@ -23,12 +30,15 @@ class ChatGPTMessage
     private array $messages;
 
     /**
-     * @param int $user_id
+     * @param Lead $lead
+     * @param Project $project
+     *
      * @param ChatGPTMessageResponse $message_response
      */
-    public function __construct(int $user_id, ChatGPTMessageResponse $message_response)
+    public function __construct(Lead $lead, Project $project, ChatGPTMessageResponse $message_response)
     {
-        $this->user = User::find($user_id);
+        $this->lead = $lead;
+        $this->project = $project;
         $this->message_response = $message_response;
     }
 
@@ -46,20 +56,21 @@ class ChatGPTMessage
 
         foreach ($fragments as $fragment) {
             $message = Message::create([
-                'user_id' => $this->user->id,
-                'content' => $fragment,
-                'source' => 'ChatGPT'
+                'lead_id'    => $this->lead->id,
+                'project_id' => $this->project->id,
+                'content'    => $fragment,
+                'source'     => 'ChatGPT'
             ]);
 
             \App\Models\ChatgptMessage::create([
-                'message_id' => $message->id,
-                'chatgpt_id' => $this->message_response->getChatgptID(),
-                'object_type' => $this->message_response->getObjectType(),
-                'model' => $this->message_response->getModel(),
-                'role' => $this->message_response->getRole(),
-                'prompt_tokens' => $this->message_response->getPromptTokens(),
+                'message_id'        => $message->id,
+                'chatgpt_id'        => $this->message_response->getChatgptID(),
+                'object_type'       => $this->message_response->getObjectType(),
+                'model'             => $this->message_response->getModel(),
+                'role'              => $this->message_response->getRole(),
+                'prompt_tokens'     => $this->message_response->getPromptTokens(),
                 'completion_tokens' => $this->message_response->getCompletionTokens(),
-                'total_tokens' => $this->message_response->getTotalTokens()
+                'total_tokens'      => $this->message_response->getTotalTokens()
             ]);
 
             $this->messages[] = $message;

@@ -3,6 +3,7 @@
 namespace App\Listeners\Message;
 
 use App\Classes\ChatGPT\ChatGPTChatHistoryParser;
+use App\Classes\ChatGPT\ChatGPTChatPromptBuilder;
 use App\Classes\ChatGPT\ChatGPTClient;
 use App\Classes\Message\ChatGPTMessage;
 use App\Events\Message\BigmeloMessageStored;
@@ -35,32 +36,16 @@ class GetChatGPTMessage implements ShouldQueue
      */
     public function handle(UserMessageStored $event): void
     {
-        $user_message = $event->message;
-        $user = $user_message->user;
+        $lead_message = $event->message;
+        $lead = $lead_message->lead;
+        $project = $lead_message->project;
 
         try {
 
-            if (!$user->hasAvailableMessages()) {
+            if ($lead_message->source == 'WhatsApp' && $lead_message->whatsapp_message->media_content_type != null) {
                 $message = Message::create([
-                    'user_id' => $user_message->user_id,
-                    'content' => config('bigmelo.message.no_available_messages'),
-                    'source'  => 'Admin'
-                ]);
-
-                event(new BigmeloMessageStored($message));
-
-                Log::info(
-                    "Listener: Get ChatGPT Message, " .
-                    "issue: Messages limit exceeded for the user, " .
-                    "message_id: " . $message->id
-                );
-
-                return;
-            }
-
-            if ($user_message->source == 'WhatsApp' && $user_message->whatsapp_message->media_content_type != null) {
-                $message = Message::create([
-                    'user_id' => $user_message->user_id,
+                    'lead_id' => $lead_message->lead_id,
+                    'project_id' => $lead_message->project_id,
                     'content' => config('bigmelo.message.wrong_media_type'),
                     'source'  => 'Admin'
                 ]);
@@ -74,22 +59,16 @@ class GetChatGPTMessage implements ShouldQueue
                 );
             }
 
-            // History of messages, context
-            $old_messages = ($user->messages()->orderBy('id', 'desc')->limit(20)->get())->toArray();
-
-            // New message wrote by the "user"
-            $new_message = $user_message->content;
-
-            // Props to get new ChatGPT message
-            $chat_history_parser = new ChatGPTChatHistoryParser($old_messages, $new_message);
-
             $chat = new ChatGPTClient();
 
+            // Prompt to get new ChatGPT message
+            $chat_history_builder = new ChatGPTChatPromptBuilder($lead_message);
+
             // Get new chatGPT message
-            $chatgpt_message_response = $chat->getMessage($chat_history_parser->getChatHistory());
+            $chatgpt_message_response = $chat->getMessage($chat_history_builder->getChatPrompt());
 
             // Save message as a ChatGPT message
-            $chatgpt_message = new ChatGPTMessage($user->id, $chatgpt_message_response);
+            $chatgpt_message = new ChatGPTMessage($lead, $project, $chatgpt_message_response);
             $chatgpt_message->save();
 
             $stored_messages = $chatgpt_message->getMessages();
@@ -106,7 +85,7 @@ class GetChatGPTMessage implements ShouldQueue
         } catch (\Throwable $e) {
             Log::error(
                 'GetChatGPTMessage: Internal error, ' .
-                'user_message_id: ' . $user_message->id . ', ' .
+                'user_message_id: ' . $lead_message->id . ', ' .
                 'error: ' . $e->getMessage()
             );
         }

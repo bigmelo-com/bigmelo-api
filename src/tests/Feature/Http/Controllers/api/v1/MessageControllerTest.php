@@ -30,9 +30,10 @@ class MessageControllerTest extends TestApi
         Event::fake();
 
         $message_data = [
-            'message' => $this->faker->text(300),
-            'source'  => 'API',
-            'user_id' => 1
+            'message'       => $this->faker->text(300),
+            'source'        => 'API',
+            'lead_id'       => 1,
+            'project_id'    => 1
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
@@ -66,9 +67,10 @@ class MessageControllerTest extends TestApi
         Event::fake();
 
         $message_data = [
-            'message' => $this->faker->text(300),
-            'source'  => 'Admin',
-            'user_id' => 1
+            'message'       => $this->faker->text(300),
+            'source'        => 'Admin',
+            'lead_id'       => 1,
+            'project_id'    => 1
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
@@ -86,28 +88,32 @@ class MessageControllerTest extends TestApi
     public function admin_can_list_all_message_by_user_id(): void
     {
         $message1 = Message::create([
-            'user_id' => 1,
-            'content' => $this->faker->text(300),
-            'source'  => 'API'
+            'lead_id'       => 1,
+            'content'       => $this->faker->text(300),
+            'source'        => 'API',
+            'project_id'    => 1
         ]);
         $message2 = Message::create([
-            'user_id' => 1,
-            'content' => $this->faker->text(300),
-            'source'  => 'ChatGPT'
+            'lead_id'       => 1,
+            'content'       => $this->faker->text(300),
+            'source'        => 'ChatGPT',
+            'project_id'    => 1
         ]);
         $message3 = Message::create([
-            'user_id' => 1,
-            'content' => $this->faker->text(300),
-            'source'  => 'API'
+            'lead_id'       => 1,
+            'content'       => $this->faker->text(300),
+            'source'        => 'API',
+            'project_id'    => 1
         ]);
         $message4 = Message::create([
-            'user_id' => 2,
-            'content' => $this->faker->text(300),
-            'source'  => 'ChatGPT'
+            'lead_id'       => 2,
+            'content'       => $this->faker->text(300),
+            'source'        => 'ChatGPT',
+            'project_id'    => 1
         ]);
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
-            ->json('GET', self::ENDPOINT_MESSAGE . '?user_id=1');
+            ->json('GET', self::ENDPOINT_MESSAGE . '?lead_id=1');
 
         $response_data = json_decode($response->getContent())->data;
 

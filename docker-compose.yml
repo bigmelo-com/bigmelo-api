@@ -18,6 +18,31 @@ services:
     networks:
       - app-network
 
+  bigmelo-postgres:
+    image: postgres:15.4-alpine
+    environment:
+      - POSTGRES_DB=bigmelo
+      - POSTGRES_USER=bigmelo
+      - POSTGRES_PASSWORD=bigmelo
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+  bigmelo-pgvector:
+    image: ankane/pgvector
+    depends_on:
+      - bigmelo-postgres
+    environment:
+      - POSTGRES_HOST=bigmelo-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bigmelo
+      - POSTGRES_USER=bigmelo
+      - POSTGRES_PASSWORD=bigmelo
+    ports:
+      - '8091:5432'
+    networks:
+      - app-network
+
   bigmelo-webserver:
     image: 'nginx:alpine'
     working_dir: /app

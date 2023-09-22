@@ -15,22 +15,22 @@ class ChatCollection extends ResourceCollection
     public function toArray(Request $request): array
     {
         return [
-            'data' => array_map(function ($user) {
+            'data' => array_map(function ($lead) {
 
                 return [
-                    'id'                => $user->id,
-                    'name'              => $user->name,
-                    'last_name'         => $user->last_name,
-                    'country_code'      => $user->country_code,
-                    'phone_number'      => $user->phone_number,
-                    'full_phone_number' => $user->full_phone_number,
-                    'email'             => $user->email,
+                    'id'                => $lead->id,
+                    'name'              => $lead->first_name,
+                    'last_name'         => $lead->last_name,
+                    'country_code'      => $lead->country_code,
+                    'phone_number'      => $lead->phone_number,
+                    'full_phone_number' => $lead->full_phone_number,
+                    'email'             => $lead->email,
                     'total_messages'    => [
-                        'admin'     => $user->messages->where('source', 'Admin')->count(),
-                        'chat_gpt'  => $user->messages->where('source', 'ChatGPT')->count(),
-                        'api'       => $user->messages->where('source', 'API')->count(),
-                        'whatsapp'  => $user->messages->where('source', 'WhatsApp')->count(),
-                        'total'     => $user->messages->count()
+                        'admin'     => $lead->messages->where('source', 'Admin')->count(),
+                        'chat_gpt'  => $lead->messages->where('source', 'ChatGPT')->count(),
+                        'api'       => $lead->messages->where('source', 'API')->count(),
+                        'whatsapp'  => $lead->messages->where('source', 'WhatsApp')->count(),
+                        'total'     => $lead->messages->count()
                     ],
                 ];
             }, $this->all())

@@ -34,15 +34,11 @@ class SendMessageToWhatsapp implements ShouldQueue
         $bigmelo_message = $event->message;
 
         try {
-            $user = $bigmelo_message->user;
+            $lead = $bigmelo_message->lead;
 
             $twilio_client = new TwilioClient(env('TWILIO_PHONE_NUMBER'));
 
-            $twilio_client->sendMessageToWhatsapp($user->full_phone_number, $bigmelo_message->content);
-
-            if ($user->hasAvailableMessages()) {
-                $user->decreaseAvailableMessages();
-            }
+            $twilio_client->sendMessageToWhatsapp($lead->full_phone_number, $bigmelo_message->content);
 
             Log::info(
                 'Message sent to whatsapp, ' .

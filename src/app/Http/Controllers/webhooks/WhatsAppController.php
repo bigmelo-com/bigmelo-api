@@ -5,7 +5,9 @@ namespace App\Http\Controllers\webhooks;
 use App\Classes\Twilio\TwilioWhatsAppRequestValidator;
 use App\Events\Message\UserMessageStored;
 use App\Http\Controllers\Controller;
+use App\Models\Lead;
 use App\Models\Message;
+use App\Models\Project;
 use App\Models\User;
 use App\Models\WhatsappMessage;
 use Illuminate\Http\JsonResponse;
@@ -35,7 +37,7 @@ class WhatsAppController extends Controller
             if ($whatsapp_validator->isValidRequest()) {
                 $message_text = $content['Body'];
                 $from_number = str_replace('whatsapp:', '', $content['From']);
-                $user = User::where('full_phone_number', $from_number)->first();
+                $lead = Lead::where('full_phone_number', $from_number)->first();
 
                 $whatsapp_data = [
                     'message_id'            => 0,
@@ -56,11 +58,17 @@ class WhatsAppController extends Controller
                     'api_version'           => $content['ApiVersion'] ?? null
                 ];
 
-                if (!$user) {
+                $project = Project::where(
+                    'phone_number',
+                    str_replace('whatsapp:', '', $whatsapp_data['to'])
+                )->first();
+
+                if (!$lead) {
                     $message = Message::create([
-                        'user_id' => 0,
-                        'content' => $message_text,
-                        'source'  => 'WhatsApp'
+                        'lead_id'    => 0,
+                        'project_id' => $project->id,
+                        'content'    => $message_text,
+                        'source'     => 'WhatsApp'
                     ]);
 
                     $whatsapp_data['message_id'] = $message->id;
@@ -76,9 +84,10 @@ class WhatsAppController extends Controller
                 }
 
                 $message = Message::create([
-                    'user_id' => $user->id,
-                    'content' => $message_text,
-                    'source'  => 'WhatsApp'
+                    'lead_id'    => $lead->id,
+                    'project_id' => $project->id,
+                    'content'    => $message_text,
+                    'source'     => 'WhatsApp'
                 ]);
 
                 $whatsapp_data['message_id'] = $message->id;

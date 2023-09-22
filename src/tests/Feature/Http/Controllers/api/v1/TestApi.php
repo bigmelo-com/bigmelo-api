@@ -42,7 +42,14 @@ class TestApi extends TestCase
     {
         parent::setUp();
 
-        Artisan::call('migrate');
+        $migrations = glob('/app/database/migrations/*.php');
+        unset($migrations[17]);
+        unset($migrations[4]);
+
+        foreach ($migrations as $migration) {
+            Artisan::call('migrate', ['--path' => str_replace('app/', '', $migration)]);
+        }
+
         Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
 
         $this->faker = Factory::create();
