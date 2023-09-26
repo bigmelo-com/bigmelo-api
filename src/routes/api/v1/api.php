@@ -18,6 +18,7 @@ Route::get('/test', 'App\Http\Controllers\api\v1\TestController@index')->middlew
 
 Route::prefix('/auth')->group(function() {
     Route::post('/get-token', 'App\Http\Controllers\api\v1\AuthController@getToken');
+    Route::post('/signup', 'App\Http\Controllers\api\v1\AuthController@signUp');
 });
 
 Route::prefix('/message')->group(function() {
