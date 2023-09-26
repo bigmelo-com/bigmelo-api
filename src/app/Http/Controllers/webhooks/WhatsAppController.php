@@ -4,6 +4,7 @@ namespace App\Http\Controllers\webhooks;
 
 use App\Classes\Twilio\TwilioWhatsAppRequestValidator;
 use App\Events\Message\UserMessageStored;
+use App\Events\Webhook\WhatsappMessageReceived;
 use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\Message;
@@ -29,76 +30,12 @@ class WhatsAppController extends Controller
     public function storeMessage(Request $request): JsonResponse
     {
         try {
-            $raw_content = $request->getContent();
-            parse_str($raw_content, $content);
-
             $whatsapp_validator = new TwilioWhatsAppRequestValidator($request);
 
             if ($whatsapp_validator->isValidRequest()) {
-                $message_text = $content['Body'];
-                $from_number = str_replace('whatsapp:', '', $content['From']);
-                $lead = Lead::where('full_phone_number', $from_number)->first();
+                $raw_content = $request->getContent();
 
-                $whatsapp_data = [
-                    'message_id'            => 0,
-                    'media_content_type'    => $content['MediaContentType0'] ?? null,
-                    'sms_message_sid'       => $content['SmsMessageSid'] ?? null,
-                    'num_media'             => $content['NumMedia'] ?? null,
-                    'profile_name'          => $content['ProfileName'] ?? null,
-                    'sms_sid'               => $content['SmsSid'] ?? null,
-                    'wa_id'                 => $content['WaId'] ?? null,
-                    'sms_status'            => $content['SmsStatus'] ?? null,
-                    'to'                    => $content['To'] ?? null,
-                    'num_segments'          => $content['NumSegments'] ?? null,
-                    'referral_num_media'    => $content['ReferralNumMedia'] ?? null,
-                    'message_sid'           => $content['MessageSid'] ?? null,
-                    'account_sid'           => $content['AccountSid'] ?? null,
-                    'from'                  => $content['From'] ?? null,
-                    'media_url'             => $content['MediaUrl0'] ?? null,
-                    'api_version'           => $content['ApiVersion'] ?? null
-                ];
-
-                $project = Project::where(
-                    'phone_number',
-                    str_replace('whatsapp:', '', $whatsapp_data['to'])
-                )->first();
-
-                if (!$lead) {
-                    $message = Message::create([
-                        'lead_id'    => 0,
-                        'project_id' => $project->id,
-                        'content'    => $message_text,
-                        'source'     => 'WhatsApp'
-                    ]);
-
-                    $whatsapp_data['message_id'] = $message->id;
-                    WhatsappMessage::create($whatsapp_data);
-
-                    Log::info(
-                        'Message from a unknown whatsapp number stored, ' .
-                        'message_id: ' . $message->id . ', ' .
-                        'phone_number: ' . $from_number
-                    );
-
-                    return response()->json(['message' => 'User not found.'], 404);
-                }
-
-                $message = Message::create([
-                    'lead_id'    => $lead->id,
-                    'project_id' => $project->id,
-                    'content'    => $message_text,
-                    'source'     => 'WhatsApp'
-                ]);
-
-                $whatsapp_data['message_id'] = $message->id;
-                WhatsappMessage::create($whatsapp_data);
-
-                event(new UserMessageStored($message));
-
-                Log::info(
-                    'Message from whatsapp stored, ' .
-                    'message_id: ' . $message->id
-                );
+                event(new WhatsappMessageReceived($raw_content));
 
                 return response()->json(['message' => 'Message has been stored successfully.'], 200);
             }
