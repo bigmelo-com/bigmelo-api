@@ -54,21 +54,32 @@ class AuthControllerTest extends TestApi
         $response->assertJsonPath('message', 'Your email or password are incorrect.');
     }
 
-     /**
+    /**
      * @test
      *
      * @return void
      */
     public function user_do_successful_signup(): void
     {
-        // $response = $this->json('post', '/v1/auth/get-token', [
-        //     'email' => 'wrong_email@mydomain.com',
-        //     'password' => 'wrong_password',
-        // ]);
+        $response = $this->json('post', '/v1/auth/signup', [
+            'name' => 'User',
+            'last_name' => 'Test',
+            'email' => 'test@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'country_code' => '+57',
+            'phone_number' => '3248972647',
+            'full_phone_number' => '+573248972647',
+        ]);
 
-        // $response->assertStatus(403);
-        // $response->assertJsonPath('message', 'Your email or password are incorrect.');
-        $this->assertTrue(true);
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['access_token', 'user']);
+        $response->assertJsonPath('user.name', 'User');
+        $response->assertJsonPath('user.last_name', 'Test');
+        $response->assertJsonPath('user.email', 'test@example.com');
+        $response->assertJsonPath('user.country_code', '+57');
+        $response->assertJsonPath('user.phone_number', '3248972647');
+        $response->assertJsonPath('user.full_phone_number', '+573248972647');
     }
 
 }
