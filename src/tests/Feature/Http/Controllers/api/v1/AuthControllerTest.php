@@ -82,4 +82,40 @@ class AuthControllerTest extends TestApi
         $response->assertJsonPath('user.full_phone_number', '+573248972647');
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_signup_error_invalid_data(): void
+    {
+
+        $invalid_data = [
+            'name'                  => '', 
+            'last_name'             => '', 
+            'email'                 => 'wrongEmail', 
+            'password'              => 'short',
+            'password_confirmation' => 'different', 
+            'country_code'          => '',
+            'phone_number'          => '', 
+            'full_phone_number'     => '', 
+        ];
+
+        $response = $this->json('post', '/v1/auth/signup', $invalid_data);
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['errors' => []]);
+        $response->assertJsonPath('errors.name', ['The name field is required.']);
+        $response->assertJsonPath('errors.last_name', ['The last name field is required.']);
+        $response->assertJsonPath('errors.email', ['The email field must be a valid email address.']);
+        $response->assertJsonPath('errors.password', [
+            'The password field must be at least 8 characters.',
+            'The password field confirmation does not match.'
+        ]);
+        $response->assertJsonPath('errors.country_code', ['The country code field is required.']);
+        $response->assertJsonPath('errors.phone_number', ['The phone number field is required.']);
+        $response->assertJsonPath('errors.full_phone_number', ['The full phone number field is required.']);
+
+    }
+
+
 }

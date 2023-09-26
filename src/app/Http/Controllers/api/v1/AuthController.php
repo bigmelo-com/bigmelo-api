@@ -97,33 +97,33 @@ class AuthController extends Controller
      * @throws Exception
      */
     public function signUp(SignUpRequest $request): JsonResponse 
-{
-    try {
-        $user = new User();
-        $user->name = $request->name;
-        $user->last_name = $request->last_name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->country_code = $request->country_code;
-        $user->phone_number = $request->phone_number;
-        $user->full_phone_number = $request->full_phone_number;
-        $user->role = 'user';
-        $user->save();
+    {
+        try {
+            $user = new User();
+            $user->name = $request->name;
+            $user->last_name = $request->last_name;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->country_code = $request->country_code;
+            $user->phone_number = $request->phone_number;
+            $user->full_phone_number = $request->full_phone_number;
+            $user->role = 'user';
+            $user->save();
 
-        $token = $user->createToken('token-name', $user->getRoleAbilities());
+            $token = $user->createToken('token-name', $user->getRoleAbilities());
 
-        return response()->json(
-            [
-                'access_token' => $token->plainTextToken,
-                'user' => $user,
-            ],
-            200
-        );
+            return response()->json(
+                [
+                    'access_token' => $token->plainTextToken,
+                    'user' => $user,
+                ],
+                200
+            );
 
-    } catch (ValidationException $e) {
-        return response()->json(['message' => $e->errors()], 400);
-    } catch (\Exception $e) {
-        return response()->json(['message' => $e->getMessage()], 500);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => $e->errors()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
-}
 }
