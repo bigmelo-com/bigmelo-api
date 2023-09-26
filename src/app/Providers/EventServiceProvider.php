@@ -33,6 +33,13 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Message\BigmeloMessageStored' => [
             'App\Listeners\Message\SendMessageToWhatsapp',
         ],
+
+        /*
+         * Webhooks events
+         */
+        'App\Events\Webhook\WhatsappMessageReceived' => [
+            'App\Listeners\Message\StoreMessageFromWhatsapp',
+        ],
     ];
 
     /**
