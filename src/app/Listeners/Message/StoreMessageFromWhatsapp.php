@@ -52,7 +52,7 @@ class StoreMessageFromWhatsapp
 
             $from_number = str_replace('whatsapp:', '', $content['From']);
 
-            $lead = Lead::where('project_id', $project->id)->where('full_phone_number', $from_number)->first();
+            $lead = $project->leads->where('full_phone_number', $from_number)->first();
 
             if (!$lead) {
                 $lead = Lead::create([
