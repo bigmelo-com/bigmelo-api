@@ -53,21 +53,11 @@ class StoreMessageFromWhatsapp
             )->first();
 
             if (!$lead) {
-                $message = Message::create([
-                    'lead_id'    => 0,
-                    'project_id' => $project->id,
-                    'content'    => $message_text,
-                    'source'     => 'WhatsApp'
+                $lead = Lead::create([
+                    'country_code'      => substr($from_number, 0, -10),
+                    'phone_number'      => substr($from_number, -10),
+                    'full_phone_number' => $from_number,
                 ]);
-
-                $whatsapp_data['message_id'] = $message->id;
-                WhatsappMessage::create($whatsapp_data);
-
-                Log::info(
-                    'Message from a unknown whatsapp number stored, ' .
-                    'message_id: ' . $message->id . ', ' .
-                    'phone_number: ' . $from_number
-                );
             }
 
             $message = Message::create([
