@@ -24,10 +24,6 @@ class StoreMessageFromWhatsapp
         try {
             parse_str($raw_content, $content);
 
-            $message_text = $content['Body'];
-            $from_number = str_replace('whatsapp:', '', $content['From']);
-            $lead = Lead::where('full_phone_number', $from_number)->first();
-
             $whatsapp_data = [
                 'message_id'            => 0,
                 'media_content_type'    => $content['MediaContentType0'] ?? null,
@@ -47,10 +43,16 @@ class StoreMessageFromWhatsapp
                 'api_version'           => $content['ApiVersion'] ?? null
             ];
 
+            $message_text = $content['Body'];
+
             $project = Project::where(
                 'phone_number',
                 str_replace('whatsapp:', '', $whatsapp_data['to'])
             )->first();
+
+            $from_number = str_replace('whatsapp:', '', $content['From']);
+
+            $lead = Lead::where('project_id', $project->id)->where('full_phone_number', $from_number)->first();
 
             if (!$lead) {
                 $lead = Lead::create([
@@ -58,6 +60,8 @@ class StoreMessageFromWhatsapp
                     'phone_number'      => substr($from_number, -10),
                     'full_phone_number' => $from_number,
                 ]);
+
+                $lead->projects()->attach($project);
             }
 
             $message = Message::create([
