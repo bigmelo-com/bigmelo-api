@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\SignUpRequest;
 use App\Models\User;
@@ -92,11 +93,13 @@ class AuthController extends Controller
      * New user signup.
      *
      * @param SignUpRequest $request
+     *
      * @return JsonResponse
+     *
      * @throws ValidationException
      * @throws Exception
      */
-    public function signUp(SignUpRequest $request): JsonResponse 
+    public function signUp(SignUpRequest $request): JsonResponse
     {
         try {
             $user = new User();
@@ -109,6 +112,9 @@ class AuthController extends Controller
             $user->full_phone_number = $request->full_phone_number;
             $user->role = 'user';
             $user->save();
+
+            $user->refresh();
+            event(new UserStored($user));
 
             $token = $user->createToken('token-name', $user->getRoleAbilities());
 
