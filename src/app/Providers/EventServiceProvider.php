@@ -21,15 +21,18 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         /*
-         * User message events
+         * User events
+         */
+        'App\Events\User\UserStored' => [
+            'App\Listeners\User\CreateLeadFromNewUser',
+        ],
+
+        /*
+         * Message events
          */
         'App\Events\Message\UserMessageStored' => [
             'App\Listeners\Message\GetChatGPTMessage',
         ],
-
-        /*
-         * Bigmelo message events
-         */
         'App\Events\Message\BigmeloMessageStored' => [
             'App\Listeners\Message\SendMessageToWhatsapp',
         ],

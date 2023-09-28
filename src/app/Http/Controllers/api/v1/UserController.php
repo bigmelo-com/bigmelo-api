@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Models\User;
@@ -96,6 +97,8 @@ class UserController extends Controller
                 'full_phone_number' => $request->full_phone_number,
                 'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
             ]);
+
+            event(new UserStored($user));
 
             return response()->json(
                 ['message' => 'User has been stored successfully.', 'user_id' => $user->id],
