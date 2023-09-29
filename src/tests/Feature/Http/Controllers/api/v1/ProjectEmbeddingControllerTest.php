@@ -6,6 +6,8 @@ use App\Models\Lead;
 use App\Models\Organization;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ProjectEmbeddingControllerTest
@@ -118,8 +120,11 @@ class ProjectEmbeddingControllerTest extends TestApi
             'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
         ]);
 
+        $file = UploadedFile::fake()->create('test.txt', 1024);
+        $content = ['file' => $file];
+
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'qwerty123'))
-            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', []);
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', $content);
 
         $response->assertStatus(422);
         $response->assertJsonPath('message', 'The current user is not the the organization owner.');
@@ -179,8 +184,11 @@ class ProjectEmbeddingControllerTest extends TestApi
         ]);
         $user_owner->lead->projects()->attach($project);
 
+        $file = UploadedFile::fake()->create('test.txt', 1024);
+        $content = ['file' => $file];
+
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'qwerty123'))
-            ->json('POST', self::ENDPOINT_PROJECT . '/' . $project->id . '/content', []);
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $project->id . '/content', $content);
 
         $response->assertStatus(422);
         $response->assertJsonPath('message', 'The current user is not the the organization owner.');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Classes\ChatGPT\ChatGPTClient;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Project\StoreProjectContentRequest;
 use App\Models\Project;
 use App\Models\ProjectEmbedding;
 use Illuminate\Http\JsonResponse;
@@ -11,10 +12,23 @@ use Illuminate\Http\Request;
 
 class ProjectEmbeddingController extends Controller
 {
-    public function store(Request $request, string $project_id): JsonResponse
+    /**
+     * Store the project content from a txt file
+     *
+     * @param StoreProjectContentRequest $request
+     * @param string $project_id
+     *
+     * @return JsonResponse
+     */
+    public function store(StoreProjectContentRequest $request, string $project_id): JsonResponse
     {
         try {
             $project = Project::find($project_id);
+
+            if (!$project) {
+                return response()->json(['message' => "Project not found."], 404);
+            }
+
             $is_owner = $project->organization->owner->id === $request->user()->id;
 
             if (!$is_owner && $request->user()->role != 'admin') {
