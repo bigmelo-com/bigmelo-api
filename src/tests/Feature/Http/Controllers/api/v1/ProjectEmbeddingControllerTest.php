@@ -194,4 +194,31 @@ class ProjectEmbeddingControllerTest extends TestApi
         $response->assertJsonPath('message', 'The current user is not the the organization owner.');
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function wrong_file_format_can_not_be_stored_in_a_project_content(): void
+    {
+        $user = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3131234567',
+            'full_phone_number' => '+573131234567',
+            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+        ]);
+
+        $file = UploadedFile::fake()->create('test.pdf', 1024);
+        $content = ['file' => $file];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'qwerty123'))
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', $content);
+
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['errors' => ['file']]);
+    }
+
 }
