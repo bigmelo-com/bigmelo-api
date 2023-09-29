@@ -11,15 +11,32 @@ use Illuminate\Http\Request;
 
 class ProjectEmbeddingController extends Controller
 {
+    public function store(Request $request, string $project_id): JsonResponse
+    {
+        try {
+            $project = Project::find($project_id);
+            $is_owner = $project->organization->owner->id === $request->user()->id;
+
+            if (!$is_owner && $request->user()->role != 'admin') {
+                return response()->json(['message' => "The current user is not the the organization owner."], 422);
+            }
+
+            return response()->json(['message' => "Content for project $project_id"], 500);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * get texts and store project embeddings.
      *
      * @param Request $request
-     * @param Project $project
+     * @param string $project_id
      *
      * @return JsonResponse
      */
-    public function store(Request $request, string $project_id): JsonResponse
+    public function store_embeddings(Request $request, string $project_id): JsonResponse
     {
         try {
             $project = Project::find($project_id);
@@ -43,7 +60,7 @@ class ProjectEmbeddingController extends Controller
                 ProjectEmbedding::create($embedding);
             }
 
-            return response()->json(['message' => 'Storing embeddings for project ' . $project->id], 500);
+            return response()->json(['message' => 'Storing embeddings for project ' . $project->id], 200);
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);

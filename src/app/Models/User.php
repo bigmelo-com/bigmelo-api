@@ -73,6 +73,15 @@ class User extends Authenticatable
         return $this->hasOne(Lead::class, 'user_id', 'id');
     }
 
+    /**
+     * Organizations where the current user is the owner
+     *
+     * @return HasMany
+     */
+    public function own_organizations(): HasMany
+    {
+        return $this->hasMany(Organization::class, 'owner_id', 'id');
+    }
 
     /**
      * Organizations related to the user
