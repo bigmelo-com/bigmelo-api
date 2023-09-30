@@ -221,4 +221,21 @@ class ProjectEmbeddingControllerTest extends TestApi
         $response->assertJsonStructure(['errors' => ['file']]);
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_store_project_content(): void
+    {
+        $file = UploadedFile::fake()->create('test.txt', 1024);
+        $content = ['file' => $file];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', $content);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'Project content upload successfully.');
+    }
+
 }

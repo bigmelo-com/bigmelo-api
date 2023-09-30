@@ -6,6 +6,7 @@ use App\Classes\ChatGPT\ChatGPTClient;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\StoreProjectContentRequest;
 use App\Models\Project;
+use App\Models\ProjectContent;
 use App\Models\ProjectEmbedding;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,29 @@ class ProjectEmbeddingController extends Controller
                 return response()->json(['message' => "The current user is not the the organization owner."], 422);
             }
 
-            return response()->json(['message' => "Content for project $project_id"], 500);
+            $file = $request->file('file');
+            $content = $file->getContent();
+            $embeddings = explode("\n-----\n", $content);
+            $total_embeddings = count($embeddings);
+
+            if ($total_embeddings === 0) {
+                return response()->json(['message' => "No content to use in the file."], 422);
+            }
+
+            $project_content = ProjectContent::create([
+                'project_id'       => $project_id,
+                'content'          => $content,
+                'total_embeddings' => $total_embeddings
+            ]);
+
+            return response()->json(
+                [
+                    'message'            => "Project content upload successfully.",
+                    'project_id'         => $project_id,
+                    'project_content_id' => $project_content->id
+                ],
+                200
+            );
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
