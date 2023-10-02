@@ -7,6 +7,7 @@ use App\Models\Organization;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -228,6 +229,8 @@ class ProjectEmbeddingControllerTest extends TestApi
      */
     public function admin_can_store_project_content(): void
     {
+        Event::fake();
+        
         $file = UploadedFile::fake()->create('test.txt', 1024);
         $content = ['file' => $file];
 

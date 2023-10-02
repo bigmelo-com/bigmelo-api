@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Classes\ChatGPT\ChatGPTClient;
+use App\Events\Project\ProjectContentStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\StoreProjectContentRequest;
 use App\Models\Project;
@@ -50,6 +51,8 @@ class ProjectEmbeddingController extends Controller
                 'content'          => $content,
                 'total_embeddings' => $total_embeddings
             ]);
+
+            event(new ProjectContentStored($project_content));
 
             return response()->json(
                 [

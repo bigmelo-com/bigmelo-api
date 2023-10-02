@@ -46,6 +46,7 @@ class TestApi extends TestCase
         parent::setUp();
 
         $migrations = glob('/app/database/migrations/*.php');
+        unset($migrations[20]);
         unset($migrations[17]);
         unset($migrations[4]);
 

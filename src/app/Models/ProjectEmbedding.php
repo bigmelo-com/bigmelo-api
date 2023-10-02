@@ -17,6 +17,7 @@ class ProjectEmbedding extends Model
      */
     protected $fillable = [
         'project_id',
+        'project_content_id',
         'text',
         'embedding'
     ];
