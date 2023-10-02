@@ -21,6 +21,55 @@ class ProjectEmbeddingController extends Controller
      * @param string $project_id
      *
      * @return JsonResponse
+     *
+     * @OA\Post(
+     *     path="/v1/project/{project_id}/content",
+     *     operationId="storeProjectContent",
+     *     description="Store a project content from a txt file.",
+     *     tags={"Project Content"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         description="ID of project related to the new content",
+     *         in="path",
+     *         name="project_id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"file"},
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Content stored.",
+     *         @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Project content upload successfully.")
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Wrong Request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     )
+     * )
      */
     public function store(StoreProjectContentRequest $request, string $project_id): JsonResponse
     {

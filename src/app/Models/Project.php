@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
@@ -34,7 +35,7 @@ class Project extends Model
     /**
      * Organization linked to the project
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function organization(): BelongsTo
     {
@@ -44,10 +45,30 @@ class Project extends Model
     /**
      * Leads related to the user
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function leads(): BelongsToMany
     {
         return $this->belongsToMany(Lead::class);
+    }
+
+    /**
+     * Project contents
+     *
+     * @return HasMany
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(ProjectContent::class, 'project_id', 'id');
+    }
+
+    /**
+     * The current active content
+     *
+     * @return ProjectContent|null
+     */
+    public function currentContent(): ?ProjectContent
+    {
+        return $this->contents()->where('active', true)->first();
     }
 }

@@ -39,8 +39,10 @@ class StoreEmbeddingsFromContent implements ShouldQueue
 
             $chat_gpt_client = new ChatGPTClient();
 
+            $embeddings = [];
+
             foreach ($embeddings_text as $text) {
-                ProjectEmbedding::create([
+                $embeddings[] = ProjectEmbedding::create([
                     'project_id'         => $project_content->project_id,
                     'project_content_id' => $project_content->id,
                     'text'               => $text,
@@ -48,9 +50,15 @@ class StoreEmbeddingsFromContent implements ShouldQueue
                 ]);
             }
 
-            // Update project content status
+            if ($project_content->total_embeddings === count($embeddings)) {
+                $project_content->markAsCompleted();
+            } else {
+                $project_content->markAsError();
+            }
 
         } catch (\Throwable $e) {
+            $project_content->markAsError();
+
             Log::error(
                 'StoreEmbeddingsFromContent: Internal error, ' .
                 "project_id: " . $project_content->project_id . ", " .
