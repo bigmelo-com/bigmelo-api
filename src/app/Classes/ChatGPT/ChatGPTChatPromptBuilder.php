@@ -80,12 +80,16 @@ class ChatGPTChatPromptBuilder
     {
         $project = $this->message->project;
         $new_message_text = $this->message->content;
+        $content = $project->currentContent();
 
         $chat = new ChatGPTClient();
 
         $new_message_vector = new Vector($chat->getEmbedding($new_message_text));
 
-        $possible_text_source = ProjectEmbedding::orderByRaw('embedding <-> ?', [$new_message_vector])->take(5)->get();
+        $possible_text_source = ProjectEmbedding::where('project_content_id', $content->id)
+            ->orderByRaw('embedding <-> ?', [$new_message_vector])
+            ->take(5)
+            ->get();
 
         $system_content = "You are " . $project->assistant_description . " ";
         $system_content .= "who tries " . $project->assistant_goal . ". ";
@@ -103,10 +107,11 @@ class ChatGPTChatPromptBuilder
             $system_content .= "\n```\n\n";
 
             $system_content .= "The user will ask things about he as " . $project->target_public . " ";
-            $system_content .= "according to the previous text and you should reply in a concise way. If you consider that
-                            the answer is not in the previous text or about a different topic, or is not a issue as " .
-                $project->target_public .", ";
-            $system_content .= "you have to answer with '" . $project->default_answer . "'";
+            $system_content .= "according to the previous text and you should reply in a concise way. If you consider
+                            that the answer is not in the previous text, or it is about yourself, or about a different
+                            topic, or is not a issue as " . $project->target_public .", ";
+            $system_content .= "you have to answer with '" . $project->default_answer . "'. Never say you are ChatGPT
+                            or something related to that.";
         }
 
         $system_content .= "Always reply in " . $project->language . " language.";

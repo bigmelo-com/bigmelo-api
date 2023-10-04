@@ -28,6 +28,13 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         /*
+         * Project events
+         */
+        'App\Events\Project\ProjectContentStored' => [
+            'App\Listeners\Project\StoreEmbeddingsFromContent',
+        ],
+
+        /*
          * Message events
          */
         'App\Events\Message\UserMessageStored' => [

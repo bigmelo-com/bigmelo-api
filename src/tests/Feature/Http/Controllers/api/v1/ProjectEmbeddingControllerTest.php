@@ -2,7 +2,13 @@
 
 namespace Tests\Feature\Http\Controllers\api\v1;
 
+use App\Models\Lead;
+use App\Models\Organization;
 use App\Models\Project;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ProjectEmbeddingControllerTest
@@ -15,9 +21,9 @@ use App\Models\Project;
 class ProjectEmbeddingControllerTest extends TestApi
 {
     /**
-     * Project embeddings api endpoint
+     * Project api endpoint
      */
-    const ENDPOINT_PROJECT_EMBEDDINGS = '/v1/project/:project_id/embeddings';
+    const ENDPOINT_PROJECT = '/v1/project';
 
     /**
      * @var Project
@@ -38,18 +44,6 @@ class ProjectEmbeddingControllerTest extends TestApi
             'system_prompt'     => $this->faker->text(200),
             'phone_number'      => $this->faker->numerify('+############'),
         ]);
-    }
-
-    /**
-     * Return endpoint with url params
-     *
-     * @param int $project_id
-     *
-     * @return string
-     */
-    private function getEndpointUrl(int $project_id): string
-    {
-        return str_replace(':project_id', (string)$project_id, self::ENDPOINT_PROJECT_EMBEDDINGS);
     }
 
     /**
@@ -90,11 +84,161 @@ class ProjectEmbeddingControllerTest extends TestApi
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
-            ->json('POST', $this->getEndpointUrl($this->project->id), $embeddings_data);
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/embedding', $embeddings_data);
 
         $response->assertStatus(200);
         $response->assertJsonPath('message', 'Project embeddings have been stored successfully.');
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthorized_user_can_not_store_project_content(): void
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->faker->word())
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', []);
+
+        $response->assertStatus(401);
+        $response->assertJsonPath('message', 'Unauthenticated.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function no_admin_user_can_not_store_project_content(): void
+    {
+        $user = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3131234567',
+            'full_phone_number' => '+573131234567',
+            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+        ]);
+
+        $file = UploadedFile::fake()->create('test.txt', 1024);
+        $content = ['file' => $file];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'qwerty123'))
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', $content);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('message', 'The current user is not the the organization owner.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function no_owner_user_can_not_store_project_content(): void
+    {
+        $user = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3131234567',
+            'full_phone_number' => '+573131234567',
+            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+        ]);
+
+        $user_owner = User::create([
+            'role'              => 'user',
+            'name'              => 'Tony',
+            'email'             => 'tony.stark@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3130000000',
+            'full_phone_number' => '+573130000000',
+            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+        ]);
+        $lead = Lead::create([
+            'user_id'           => $user_owner->id,
+            'first_name'        => $user_owner->name,
+            'last_name'         => $user_owner->last_name,
+            'email'             => $user_owner->email,
+            'country_code'      => $user_owner->country_code,
+            'phone_number'      => $user_owner->phone_number,
+            'full_phone_number' => $user_owner->full_phone_number,
+        ]);
+        $organization = Organization::create([
+            'owner_id'      => $user_owner->id,
+            'name'          => 'Bigmelo',
+            'description'   => 'Initial organization.',
+        ]);
+        $user_owner->organizations()->attach($organization);
+        $project = Project::create([
+            'organization_id'       => $organization->id,
+            'name'                  => 'Test',
+            'description'           => 'Project test.',
+            'phone_number'          => '+14150000000',
+            'assistant_description' => 'a nice chatbot powering by AI',
+            'assistant_goal'        => 'to help all people to answer their questions and doubts',
+            'language'              => 'Spanish',
+            'default_answer'        => 'Hummmm.',
+            'has_system_prompt'     => false
+        ]);
+        $user_owner->lead->projects()->attach($project);
+
+        $file = UploadedFile::fake()->create('test.txt', 1024);
+        $content = ['file' => $file];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'qwerty123'))
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $project->id . '/content', $content);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('message', 'The current user is not the the organization owner.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function wrong_file_format_can_not_be_stored_in_a_project_content(): void
+    {
+        $user = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3131234567',
+            'full_phone_number' => '+573131234567',
+            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+        ]);
+
+        $file = UploadedFile::fake()->create('test.pdf', 1024);
+        $content = ['file' => $file];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'qwerty123'))
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', $content);
+
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['errors' => ['file']]);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_store_project_content(): void
+    {
+        Event::fake();
+        
+        $file = UploadedFile::fake()->create('test.txt', 1024);
+        $content = ['file' => $file];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('POST', self::ENDPOINT_PROJECT . '/' . $this->project->id . '/content', $content);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'Project content upload successfully.');
+    }
 
 }

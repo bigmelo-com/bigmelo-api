@@ -3,21 +3,6 @@
 ###############################################################################
 version: '3.1'
 services:
-  bigmelo-mysql:
-    image: 'mysql:8.0'
-    working_dir: /app
-    volumes:
-      - './data:/app'
-    environment:
-      - MYSQL_ROOT_PASSWORD=bigmelo
-      - MYSQL_DATABASE=bigmelo
-      - MYSQL_USER=bigmelo
-      - MYSQL_PASSWORD=bigmelo
-    ports:
-      - '8011:3306'
-    networks:
-      - app-network
-
   bigmelo-postgres:
     image: postgres:15.4-alpine
     environment:
