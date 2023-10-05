@@ -42,11 +42,13 @@ class StoreEmbeddingsFromContent implements ShouldQueue
             $embeddings = [];
 
             foreach ($embeddings_text as $text) {
+                $new_embedding = $chat_gpt_client->getEmbedding($text);
+
                 $embeddings[] = ProjectEmbedding::create([
                     'project_id'         => $project_content->project_id,
                     'project_content_id' => $project_content->id,
                     'text'               => $text,
-                    'embedding'          => $chat_gpt_client->getEmbedding($text)
+                    'embedding'          => $new_embedding->getEmbedding()
                 ]);
             }
 

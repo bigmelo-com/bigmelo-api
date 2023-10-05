@@ -69,11 +69,11 @@ class ChatGPTClient
      *
      * @param string $text
      *
-     * @return array
+     * @return ChatGPTEmbedding
      *
      * @throws ChatGPTClientCouldNotGetANewMessageException
      */
-    public function getEmbedding(string $text): array
+    public function getEmbedding(string $text): ChatGPTEmbedding
     {
         try {
             $response = $this->client->embeddings()->create([
@@ -82,7 +82,11 @@ class ChatGPTClient
             ]);
 
             if (isset($response->embeddings[0])) {
-                return $response->embeddings[0]->embedding;
+                return new ChatGPTEmbedding(
+                    embedding: $response->embeddings[0]->embedding,
+                    prompt_tokens: $response->usage->promptTokens ?? null,
+                    total_tokens: $response->usage->totalTokens ?? null
+                );
             }
 
             throw new ChatGPTClientCouldNotGetANewMessageException(
