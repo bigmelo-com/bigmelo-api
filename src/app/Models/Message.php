@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Classes\ChatGPT\ChatGPTEmbedding;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -57,5 +58,21 @@ class Message extends Model
     public function whatsapp_message(): ?HasOne
     {
         return $this->hasOne(WhatsappMessage::class, 'message_id');
+    }
+
+    /**
+     * Store extra embedding data
+     *
+     * @param ChatGPTEmbedding $embedding
+     *
+     * @return void
+     */
+    public function storeChatGPTEmbeddingData(ChatGPTEmbedding $embedding): void
+    {
+        OpenaiTokensEmbedding::create([
+            'message_id'    => $this->id,
+            'prompt_tokens' => $embedding->getPromptTokens(),
+            'total_tokens'  => $embedding->getTotalTokens()
+        ]);
     }
 }

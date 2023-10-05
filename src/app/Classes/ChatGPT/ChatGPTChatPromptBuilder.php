@@ -4,6 +4,7 @@ namespace App\Classes\ChatGPT;
 
 use App\Exceptions\ChatGPT\ChatGPTChatHistoryParserWrongMessageHistoryDataException;
 use App\Models\Message;
+use App\Models\OpenaiTokensEmbedding;
 use App\Models\ProjectEmbedding;
 use Pgvector\Laravel\Vector;
 
@@ -85,8 +86,9 @@ class ChatGPTChatPromptBuilder
         $chat = new ChatGPTClient();
 
         $new_message_embedding = $chat->getEmbedding($new_message_text);
+        $this->message->storeChatGPTEmbeddingData($new_message_embedding);
 
-        $new_message_vector = new Vector($chat->getEmbedding($new_message_embedding->getEmbedding()));
+        $new_message_vector = new Vector($new_message_embedding->getEmbedding());
 
         $possible_text_source = ProjectEmbedding::where('project_content_id', $content->id)
             ->orderByRaw('embedding <-> ?', [$new_message_vector])

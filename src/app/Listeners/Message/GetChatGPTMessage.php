@@ -13,9 +13,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class GetChatGPTMessage //implements ShouldQueue
+class GetChatGPTMessage implements ShouldQueue
 {
-//    use InteractsWithQueue;
+    use InteractsWithQueue;
 
     /**
      * The number of times the queued listener may be attempted.
