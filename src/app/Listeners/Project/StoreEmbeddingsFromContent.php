@@ -39,18 +39,24 @@ class StoreEmbeddingsFromContent implements ShouldQueue
 
             $chat_gpt_client = new ChatGPTClient();
 
-            $embeddings = [];
+            $total_embeddings = 0;
 
             foreach ($embeddings_text as $text) {
-                $embeddings[] = ProjectEmbedding::create([
+                $new_embedding = $chat_gpt_client->getEmbedding($text);
+
+                $project_embedding = ProjectEmbedding::create([
                     'project_id'         => $project_content->project_id,
                     'project_content_id' => $project_content->id,
                     'text'               => $text,
-                    'embedding'          => $chat_gpt_client->getEmbedding($text)
+                    'embedding'          => $new_embedding->getEmbedding()
                 ]);
+
+                $project_embedding->storeOpenAIEmbeddingData($new_embedding);
+
+                $total_embeddings++;
             }
 
-            if ($project_content->total_embeddings === count($embeddings)) {
+            if ($project_content->total_embeddings === $total_embeddings) {
                 $project_content->markAsCompleted();
             } else {
                 $project_content->markAsError();
