@@ -90,7 +90,7 @@ class ChatGPTChatPromptBuilder
 
         $new_message_vector = new Vector($new_message_embedding->getEmbedding());
 
-        $possible_text_source = ProjectEmbedding::where('project_content_id', $content->id)
+        $possible_text_source = ProjectEmbedding::where('project_content_id', $content ? $content->id : 0)
             ->orderByRaw('embedding <-> ?', [$new_message_vector])
             ->take(5)
             ->get();
