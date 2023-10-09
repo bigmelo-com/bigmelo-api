@@ -42,6 +42,11 @@ class TwilioWhatsAppRequestValidator
         $this->url = $request->fullUrl();
 
         $this->content = $request->toArray();
+
+        // Switch to the body content if this is a JSON request.
+        if (array_key_exists('bodySHA256', $this->content)) {
+            $this->content = $request->getContent();
+        }
     }
 
     /**
