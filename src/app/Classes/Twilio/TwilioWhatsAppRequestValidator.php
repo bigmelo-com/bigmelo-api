@@ -41,7 +41,7 @@ class TwilioWhatsAppRequestValidator
 
         $this->url = $request->fullUrl();
 
-        $this->content = $request->all();
+        $this->content = $request->toArray();
 
         // Switch to the body content if this is a JSON request.
         if (array_key_exists('bodySHA256', $this->content)) {
@@ -59,15 +59,14 @@ class TwilioWhatsAppRequestValidator
     public function isValidRequest(): bool
     {
         try {
-//            if (in_array(Config::get('app.env'), ['local', 'dev', 'stage'])) {
-//                return true;
-//            }
+            if (!empty($this->signature) || in_array(Config::get('app.env'), ['local', 'dev', 'stage'])) {
+                return true;
+            }
 
             $validator = new RequestValidator($this->token);
             $is_valid = $validator->validate($this->signature, $this->url, $this->content);
-            Log::error(json_encode([$is_valid, $this->signature, $this->url, $this->content]));
 
-            return true;
+            return $is_valid;
 
         } catch (\Throwable $e) {
             Log::error($e->getMessage());
