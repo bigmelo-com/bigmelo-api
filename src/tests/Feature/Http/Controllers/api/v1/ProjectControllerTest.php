@@ -114,4 +114,112 @@ class ProjectControllerTest extends TestApi
         $response->assertJsonPath('message', 'Unauthenticated.');
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_edit_a_specific_project(): void
+    {
+        $project = Project::create([
+            'organization_id'           => 1,
+            'name'                      => $this->faker->name,
+            'description'               => $this->faker->text(200),
+            'phone_number'              => $this->faker->numerify('+############'),
+            'assistant_description'     => $this->faker->text(200),
+            'assistant_goal'            => $this->faker->text(200),
+            'assistant_knowledge_about' => $this->faker->text(200),
+            'target_public'             => $this->faker->text(200),
+            'language'                  => $this->faker->word(),
+            'default_answer'            => $this->faker->text(200),
+        ]);
+
+        $project_data = [
+            'name'                      => $this->faker->name,
+            'description'               => $this->faker->text(200),
+            'assistant_description'     => $this->faker->text(200),
+            'assistant_goal'            => $this->faker->text(200),
+            'assistant_knowledge_about' => $this->faker->text(200),
+            'target_public'             => $this->faker->text(200),
+            'language'                  => $this->faker->word(),
+            'default_answer'            => $this->faker->text(200),
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('PATCH', self::ENDPOINT_PROJECT . '/' . $project->id, $project_data);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'Project has been updated successfully.');
+
+        $project->refresh();
+
+        $this->assertEquals($project_data['name'], $project->name);
+        $this->assertEquals($project_data['description'], $project->description);
+        $this->assertEquals($project_data['assistant_description'], $project->assistant_description);
+        $this->assertEquals($project_data['assistant_goal'], $project->assistant_goal);
+        $this->assertEquals($project_data['assistant_knowledge_about'], $project->assistant_knowledge_about);
+        $this->assertEquals($project_data['target_public'], $project->target_public);
+        $this->assertEquals($project_data['language'], $project->language);
+        $this->assertEquals($project_data['default_answer'], $project->default_answer);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_not_update_a_project_if_default_answer_very_short(): void
+    {
+        $project = Project::create([
+            'organization_id'           => 1,
+            'name'                      => $this->faker->name,
+            'description'               => $this->faker->text(200),
+            'phone_number'              => $this->faker->numerify('+############'),
+            'assistant_description'     => $this->faker->text(200),
+            'assistant_goal'            => $this->faker->text(200),
+            'assistant_knowledge_about' => $this->faker->text(200),
+            'target_public'             => $this->faker->text(200),
+            'language'                  => $this->faker->word(),
+            'default_answer'            => $this->faker->text(200),
+        ]);
+
+        $project_data = [
+            'default_answer'            => $this->faker->text(10),
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('PATCH', self::ENDPOINT_PROJECT . '/' . $project->id, $project_data);
+
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['errors' => ['default_answer']]);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_not_update_a_project_if_it_does_not_exist(): void
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('PATCH', self::ENDPOINT_PROJECT . '/1000', []);
+
+        $response->assertStatus(404);
+        $response->assertJsonPath('message', 'Project not found.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthorized_user_can_not_update_projects()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->faker->word())
+            ->json('PATCH', self::ENDPOINT_PROJECT . '/1000', []);
+
+        $response->assertStatus(401);
+        $response->assertJsonPath('message', 'Unauthenticated.');
+    }
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\StoreProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 
@@ -135,6 +136,132 @@ class ProjectController extends Controller
                 ],
                 200
             );
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update a specific project
+     *
+     * @param UpdateProjectRequest $request
+     * @param int $project_id
+     *
+     * @return JsonResponse
+     *
+     *
+     * @OA\Patch(
+     *     path="/v1/project/{project_id}",
+     *     operationId="updateProject",
+     *     description="Update a project.",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         description="ID of project to be updated",
+     *         in="path",
+     *         name="project_id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="name",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="description",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="assistant_description",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="assistant_goal",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="assistant_knowledge_about",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="target_public",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="language",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="default_answer",
+     *                     type="string"
+     *                 ),
+     *                 example={
+     *                     "name": "Bigmelo",
+     *                     "description": "New big organization.",
+     *                     "assistant_description": "an official of the Superintendency of Industry and Commerce",
+     *                     "assistant_goal": "to advise citizens on their consumer concerns",
+     *                     "assistant_knowledge_about": "consumer rights and consumer duties",
+     *                     "target_public": "a colombian consumer",
+     *                     "language": "Spanish",
+     *                     "target_public": "Estoy aqui solo para resolver tus dudas como consumidor"
+     *                  }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Project updd.",
+     *         @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Project has been updated successfully.")
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Project not found",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Wrong Request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+    public function update(UpdateProjectRequest $request, int $project_id): JsonResponse
+    {
+        try {
+            $project = Project::find($project_id);
+
+            if (!$project) {
+                return response()->json(['message' => 'Project not found.'], 404);
+            }
+
+            $project->name = $request->name ?? $project->name;
+            $project->description = $request->description ?? $project->description;
+            $project->assistant_description = $request->assistant_description ?? $project->assistant_description;
+            $project->assistant_goal = $request->assistant_goal ?? $project->assistant_goal;
+            $project->assistant_knowledge_about = $request->assistant_knowledge_about ?? $project->assistant_knowledge_about;
+            $project->target_public = $request->target_public ?? $project->target_public;
+            $project->language = $request->language ?? $project->language;
+            $project->default_answer = $request->default_answer ?? $project->default_answer;
+
+            $project->save();
+
+            return response()->json(['message' => 'Project has been updated successfully.'], 200);
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
