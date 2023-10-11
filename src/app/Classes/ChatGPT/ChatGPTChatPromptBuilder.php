@@ -58,10 +58,9 @@ class ChatGPTChatPromptBuilder
 
         $context_messages = (
             $lead->messages()
-                ->where('source', 'ChatGPT')
                 ->where('project_id', $this->message->project->id)
                 ->orderBy('id', 'desc')
-                ->limit(3)
+                ->limit(6)
                 ->get()
         )->toArray();
 
@@ -95,7 +94,11 @@ class ChatGPTChatPromptBuilder
             ->take(5)
             ->get();
 
-        $system_content = "You are " . $project->assistant_description . " ";
+        $current_date = new \DateTime("now", new \DateTimeZone('America/Bogota'));
+
+        $system_content = "Current date and time with format 'Y-m-d H:i:s' is " . $current_date->format('Y-m-d H:i:s');
+        $system_content .= ".\n";
+        $system_content .= "You are " . $project->assistant_description . " ";
         $system_content .= "who tries " . $project->assistant_goal . ". ";
 
         if ($project->has_system_prompt && $possible_text_source->count() > 0) {
