@@ -44,3 +44,7 @@ Route::prefix('/project')->group(function() {
         Route::post('/content', 'App\Http\Controllers\api\v1\ProjectEmbeddingController@store')->middleware(['auth:sanctum', 'abilities:project:store']);
     });
 });
+
+Route::prefix('/organization')->group(function() {
+    Route::post('', 'App\Http\Controllers\api\v1\OrganizationController@store')->middleware(['auth:sanctum', 'abilities:organization:store']);
+});
