@@ -6,6 +6,7 @@ use App\Models\Lead;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\User;
+use App\Repositories\MessageRepository;
 
 class ChatGPTMessage
 {
@@ -46,21 +47,25 @@ class ChatGPTMessage
      * Save ChatGPT message
      *
      * @return void
+     *
+     * @throws \App\Exceptions\Repositories\MessageRepositoryCouldNotStoreANewMessage
      */
+
     public function save(): void
     {
+        $message_repository = new MessageRepository();
         $text = $this->message_response->getContent();
 
         // Split the text into 100-word fragments
         $fragments = preg_split('/((?:\S+\s*){1,100})/', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         foreach ($fragments as $fragment) {
-            $message = Message::create([
-                'lead_id'    => $this->lead->id,
-                'project_id' => $this->project->id,
-                'content'    => $fragment,
-                'source'     => 'ChatGPT'
-            ]);
+            $message = $message_repository->storeMessage(
+                lead_id: $this->lead->id,
+                project_id: $this->project->id,
+                content: $fragment,
+                source: 'ChatGPT'
+            );
 
             \App\Models\ChatgptMessage::create([
                 'message_id'        => $message->id,

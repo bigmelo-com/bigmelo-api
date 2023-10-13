@@ -39,8 +39,13 @@ class MessageControllerTest extends TestApi
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
             ->json('POST', self::ENDPOINT_MESSAGE, $message_data);
 
+        $response_content = json_decode($response->getContent());
+
         $response->assertStatus(200);
         $response->assertJsonStructure(['message']);
+
+        $new_message = Message::find($response_content->message_id);
+        $this->assertEquals(1, $new_message->chat_id);
     }
 
     /**

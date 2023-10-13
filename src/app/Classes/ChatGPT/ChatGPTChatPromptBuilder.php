@@ -3,9 +3,12 @@
 namespace App\Classes\ChatGPT;
 
 use App\Exceptions\ChatGPT\ChatGPTChatHistoryParserWrongMessageHistoryDataException;
+use App\Exceptions\ChatGPT\ChatGPTClientCouldNotGetANewMessageException;
 use App\Models\Message;
 use App\Models\OpenaiTokensEmbedding;
 use App\Models\ProjectEmbedding;
+use App\Repositories\MessageRepository;
+use Illuminate\Support\Facades\Log;
 use Pgvector\Laravel\Vector;
 
 class ChatGPTChatPromptBuilder
@@ -36,7 +39,7 @@ class ChatGPTChatPromptBuilder
      * @param Message $message
      *
      * @throws ChatGPTChatHistoryParserWrongMessageHistoryDataException
-     * @throws \App\Exceptions\ChatGPT\ChatGPTClientCouldNotGetANewMessageException
+     * @throws ChatGPTClientCouldNotGetANewMessageException
      */
     public function __construct(Message $message)
     {
@@ -50,7 +53,7 @@ class ChatGPTChatPromptBuilder
      * @return void
      *
      * @throws ChatGPTChatHistoryParserWrongMessageHistoryDataException
-     * @throws \App\Exceptions\ChatGPT\ChatGPTClientCouldNotGetANewMessageException
+     * @throws ChatGPTClientCouldNotGetANewMessageException
      */
     private function buildPrompt(): void
     {
@@ -58,7 +61,8 @@ class ChatGPTChatPromptBuilder
 
         $context_messages = (
             $lead->messages()
-                ->where('project_id', $this->message->project->id)
+                ->where('project_id', $this->message->project_id)
+                ->where('chat_id', $this->message->chat_id)
                 ->orderBy('id', 'desc')
                 ->limit(6)
                 ->get()
@@ -74,18 +78,19 @@ class ChatGPTChatPromptBuilder
      *
      * @return string
      *
-     * @throws \App\Exceptions\ChatGPT\ChatGPTClientCouldNotGetANewMessageException
+     * @throws ChatGPTClientCouldNotGetANewMessageException
      */
     private function getSystemPrompt(): string
     {
         $project = $this->message->project;
         $new_message_text = $this->message->content;
         $content = $project->currentContent();
+        $message_repository = new MessageRepository();
 
         $chat = new ChatGPTClient();
 
         $new_message_embedding = $chat->getEmbedding($new_message_text);
-        $this->message->storeChatGPTEmbeddingData($new_message_embedding);
+        $message_repository->storeChatGPTEmbeddingData($this->message->id, $new_message_embedding);
 
         $new_message_vector = new Vector($new_message_embedding->getEmbedding());
 

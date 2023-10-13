@@ -9,6 +9,7 @@ use App\Classes\Message\ChatGPTMessage;
 use App\Events\Message\BigmeloMessageStored;
 use App\Events\Message\UserMessageStored;
 use App\Models\Message;
+use App\Repositories\MessageRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -39,16 +40,17 @@ class GetChatGPTMessage implements ShouldQueue
         $lead_message = $event->message;
         $lead = $lead_message->lead;
         $project = $lead_message->project;
+        $message_repository = new MessageRepository();
 
         try {
 
             if ($lead_message->source == 'WhatsApp' && $lead_message->whatsapp_message->media_content_type != null) {
-                $message = Message::create([
-                    'lead_id' => $lead_message->lead_id,
-                    'project_id' => $lead_message->project_id,
-                    'content' => config('bigmelo.message.wrong_media_type'),
-                    'source'  => 'Admin'
-                ]);
+                $message = $message_repository->storeMessage(
+                    lead_id: $lead_message->lead_id,
+                    project_id: $lead_message->project_id,
+                    content: config('bigmelo.message.wrong_media_type'),
+                    source: 'Admin'
+                );
 
                 event(new BigmeloMessageStored($message));
 

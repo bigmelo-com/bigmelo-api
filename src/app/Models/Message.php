@@ -20,6 +20,7 @@ class Message extends Model
     protected $fillable = [
         'lead_id',
         'project_id',
+        'chat_id',
         'content',
         'source'
     ];
@@ -27,7 +28,7 @@ class Message extends Model
     /**
      * Lead related to the message
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function lead(): BelongsTo
     {
@@ -37,11 +38,21 @@ class Message extends Model
     /**
      * Project related to the message
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id', 'id');
+    }
+
+    /**
+     * Chat related to the message
+     *
+     * @return BelongsTo
+     */
+    public function chat(): BelongsTo
+    {
+        return $this->belongsTo(Chat::class, 'chat_id', 'id');
     }
 
     /**
@@ -58,21 +69,5 @@ class Message extends Model
     public function whatsapp_message(): ?HasOne
     {
         return $this->hasOne(WhatsappMessage::class, 'message_id');
-    }
-
-    /**
-     * Store extra embedding data
-     *
-     * @param ChatGPTEmbedding $embedding
-     *
-     * @return void
-     */
-    public function storeChatGPTEmbeddingData(ChatGPTEmbedding $embedding): void
-    {
-        OpenaiTokensEmbedding::create([
-            'message_id'    => $this->id,
-            'prompt_tokens' => $embedding->getPromptTokens(),
-            'total_tokens'  => $embedding->getTotalTokens()
-        ]);
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Lead;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\WhatsappMessage;
+use App\Repositories\MessageRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,7 @@ class StoreMessageFromWhatsapp
     public function handle(WhatsappMessageReceived $event): void
     {
         $raw_content = $event->content;
+        $message_repository = new MessageRepository();
 
         try {
             parse_str($raw_content, $content);
@@ -64,12 +66,12 @@ class StoreMessageFromWhatsapp
                 $lead->projects()->attach($project);
             }
 
-            $message = Message::create([
-                'lead_id'    => $lead->id,
-                'project_id' => $project->id,
-                'content'    => $message_text,
-                'source'     => 'WhatsApp'
-            ]);
+            $message = $message_repository->storeMessage(
+                lead_id: $lead->id,
+                project_id: $project->id,
+                content: $message_text,
+                source: 'WhatsApp'
+            );
 
             $whatsapp_data['message_id'] = $message->id;
             WhatsappMessage::create($whatsapp_data);
