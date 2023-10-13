@@ -9,12 +9,27 @@ use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageCollection;
 use App\Models\Lead;
 use App\Models\Message;
-use App\Models\User;
+use App\Repositories\MessageRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
+    /**
+     * @var MessageRepository
+     */
+    protected MessageRepository $message_repository;
+
+    /**
+     * Constructor
+     *
+     * @param MessageRepository $message_repository
+     */
+    public function __construct(MessageRepository $message_repository)
+    {
+        $this->message_repository = $message_repository;
+    }
+
     /**
      * List the message related to a user
      *
@@ -128,7 +143,7 @@ class MessageController extends Controller
      *         response=200,
      *         description="Message stores.",
      *         @OA\JsonContent(
-     *              @OA\Property(property="message", type="string", example="La velocidad de la luz es constante porque si."),
+     *              @OA\Property(property="message", type="string", example="Message has been stored successfully."),
      *          )
      *     ),
      *     @OA\Response(
@@ -158,12 +173,12 @@ class MessageController extends Controller
                 return response()->json(['message' => 'The lead is not in that project.'], 422);
             }
 
-            $message = Message::create([
-                'lead_id'       => $lead_id,
-                'project_id'    => $project_id,
-                'content'       => $request->message,
-                'source'        => $source
-            ]);
+            $message = $this->message_repository->storeMessage(
+                lead_id: $lead_id,
+                project_id: $project_id,
+                content: $request->message,
+                source: $source
+            );
 
             if ($message->source == 'Admin') {
                 event(new BigmeloMessageStored($message));
@@ -172,7 +187,13 @@ class MessageController extends Controller
 
             event(new UserMessageStored($message));
 
-            return response()->json(['message' => 'Message stored successfully.'], 200);
+            return response()->json(
+                [
+                    'message' => 'Message stored successfully.',
+                    'message_id' => $message->id
+                ],
+                200
+            );
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);

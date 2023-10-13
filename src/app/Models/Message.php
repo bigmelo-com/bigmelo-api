@@ -70,20 +70,4 @@ class Message extends Model
     {
         return $this->hasOne(WhatsappMessage::class, 'message_id');
     }
-
-    /**
-     * Store extra embedding data
-     *
-     * @param ChatGPTEmbedding $embedding
-     *
-     * @return void
-     */
-    public function storeChatGPTEmbeddingData(ChatGPTEmbedding $embedding): void
-    {
-        OpenaiTokensEmbedding::create([
-            'message_id'    => $this->id,
-            'prompt_tokens' => $embedding->getPromptTokens(),
-            'total_tokens'  => $embedding->getTotalTokens()
-        ]);
-    }
 }
