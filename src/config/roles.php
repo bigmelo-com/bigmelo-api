@@ -21,13 +21,15 @@ return [
             'chats:get',
             'user:store',
             'project:store-embeddings',
-            'project:store'
+            'project:store',
+            'organization:store'
         ]
     ],
     'user' => [
         'abilities' => [
             'message:store',
-            'project:store'
+            'project:store',
+            'organization:store'
         ]
     ],
 
