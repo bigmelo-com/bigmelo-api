@@ -4,12 +4,84 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Organization\StoreOrganizationRequest;
+use App\Http\Requests\Organization\UpdateOrganizationRequest;
+use App\Http\Resources\Organization\OrganizationCollection;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
 class OrganizationController extends Controller
 {
+    /**
+     * List organizations
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     *
+     * @OA\Get(
+     *     path="/v1/organization",
+     *     operationId="listOrganizations",
+     *     description="List all organizations.",
+     *     tags={"Organizations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *          name="user_id",
+     *          in="query",
+     *          required=false,
+     *          description="User id related to the organization",
+     *          @OA\Schema(
+     *              type="int"
+     *          )
+     *     ),
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          required=false,
+     *          description="Page number for pagination",
+     *          @OA\Schema(
+     *              type="int"
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="List all organizations.",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->input();
+            $user_id = $filters['user_id'] ?? $request->user()->id;
+
+            $user = $request->user()->role === 'admin' ? User::find($user_id) : $request->user();
+
+            if (!$user) {
+                return response()->json(['message' => 'User not found.'], 404);
+            }
+
+            if ($user->role === 'admin' && !isset($filters['user_id'])) {
+                $organizations = Organization::where('active', true)->paginate(10);
+            } else {
+                $organizations = $user->organizations()->where('active', true)->paginate(10);
+            }
+
+            return (new OrganizationCollection($organizations))->response()->setStatusCode(200);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Store a new organization
      *
@@ -101,14 +173,111 @@ class OrganizationController extends Controller
             ]);
 
             $user->own_organizations()->save($organization);
+            $user->organizations()->attach($organization);
 
             return response()->json(
                 [
                     'message'         => 'Organization has been stored successfully.',
                     'organization_id' => $organization->id
-                ],
-                200
+                ], 200
             );
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update a specific organization
+     *
+     * @param UpdateOrganizationRequest $request
+     * @param int $organization_id
+     *
+     * @return JsonResponse
+     *
+     * @OA\Patch(
+     *     path="/v1/organization/{organization_id}",
+     *     operationId="updateOrganization",
+     *     description="Update an organization.",
+     *     tags={"Organizations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         description="ID of organization to be updated",
+     *         in="path",
+     *         name="organization_id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="name",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="description",
+     *                     type="string"
+     *                 ),
+     *                 example={
+     *                     "name": "Bigmelo",
+     *                     "description": "New big organization."
+     *                  }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Organization stored.",
+     *         @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Organization has been updated successfully.")
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Organization not found",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="User is not the organization owner",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Wrong Request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+    public function update(UpdateOrganizationRequest $request, int $organization_id): JsonResponse
+    {
+        try {
+            $organization = Organization::find($organization_id);
+
+            if (!$organization) {
+                return response()->json(['message' => 'Organization not found.'], 404);
+            }
+
+            if ($request->user()->role != 'admin' && $request->user()->id != $organization->owner_id){
+                return response()->json(['message' => 'User is not the organization owner.'], 409);
+            }
+
+            $organization->name = $request->name ?? $organization->name;
+            $organization->description = $request->description ?? $organization->description;
+            $organization->save();
+
+            return response()->json(['message' => "Organization has been updated successfully."], 200);
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);

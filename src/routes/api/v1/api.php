@@ -46,5 +46,7 @@ Route::prefix('/project')->group(function() {
 });
 
 Route::prefix('/organization')->group(function() {
+    Route::get('', 'App\Http\Controllers\api\v1\OrganizationController@index')->middleware(['auth:sanctum', 'abilities:organization:list']);
     Route::post('', 'App\Http\Controllers\api\v1\OrganizationController@store')->middleware(['auth:sanctum', 'abilities:organization:store']);
+    Route::patch('/{organization_id}', 'App\Http\Controllers\api\v1\OrganizationController@update')->middleware(['auth:sanctum', 'abilities:organization:store']);
 });
