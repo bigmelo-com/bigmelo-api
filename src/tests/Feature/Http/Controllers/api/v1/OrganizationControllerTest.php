@@ -368,4 +368,213 @@ class OrganizationControllerTest extends TestApi
         $this->assertEquals($organization_data['description'], $organization->description);
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_can_list_organizations_related_to_him(): void
+    {
+        $user1 = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter Parker',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test123')
+        ]);
+
+        $user2 = User::create([
+            'role'              => 'user',
+            'name'              => 'Tony Stark',
+            'email'             => 'tony.stark@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133888888',
+            'full_phone_number' => '+573133888888',
+            'password'          => Hash::make('test123')
+        ]);
+
+        $organization1 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization2 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization3 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization4 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+
+        $user1->own_organizations()->save($organization1);
+        $user1->own_organizations()->save($organization3);
+        $user1->own_organizations()->save($organization4);
+        $user1->organizations()->attach($organization1);
+        $user1->organizations()->attach($organization3);
+        $user1->organizations()->attach($organization4);
+
+        $user2->own_organizations()->save($organization2);
+        $user2->organizations()->attach($organization2);
+        $user2->organizations()->attach($organization4);
+
+        $response = $this->withHeader(
+            'Authorization', 'Bearer ' . $this->getToken('peter.parker@gmail.com', 'test123')
+        )->json('GET', self::ENDPOINT_ORGANIZATION);
+
+        $response_data = json_decode($response->getContent())->data;
+
+        $response->assertStatus(200);
+        $this->assertCount(3, $response_data);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_list_all_organizations(): void
+    {
+        $user1 = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter Parker',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test123')
+        ]);
+
+        $user2 = User::create([
+            'role'              => 'user',
+            'name'              => 'Tony Stark',
+            'email'             => 'tony.stark@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133888888',
+            'full_phone_number' => '+573133888888',
+            'password'          => Hash::make('test123')
+        ]);
+
+        $organization1 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization2 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization3 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization4 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+
+        $user1->own_organizations()->save($organization1);
+        $user1->own_organizations()->save($organization3);
+        $user1->own_organizations()->save($organization4);
+        $user1->organizations()->attach($organization1);
+        $user1->organizations()->attach($organization3);
+        $user1->organizations()->attach($organization4);
+
+        $user2->own_organizations()->save($organization2);
+        $user2->organizations()->attach($organization2);
+        $user2->organizations()->attach($organization4);
+
+        $response = $this->withHeader(
+            'Authorization', 'Bearer ' . $this->getToken()
+        )->json('GET', self::ENDPOINT_ORGANIZATION);
+
+        $response_data = json_decode($response->getContent())->data;
+
+        $response->assertStatus(200);
+        $this->assertCount(5, $response_data);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_list_a_specific_user_organizations(): void
+    {
+        $user1 = User::create([
+            'role'              => 'user',
+            'name'              => 'Peter Parker',
+            'email'             => 'peter.parker@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test123')
+        ]);
+
+        $user2 = User::create([
+            'role'              => 'user',
+            'name'              => 'Tony Stark',
+            'email'             => 'tony.stark@gmail.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133888888',
+            'full_phone_number' => '+573133888888',
+            'password'          => Hash::make('test123')
+        ]);
+
+        $organization1 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization2 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization3 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+        $organization4 = new Organization([
+            'name'          => $this->faker->name,
+            'description'   => $this->faker->text(200)
+        ]);
+
+        $user1->own_organizations()->save($organization1);
+        $user1->own_organizations()->save($organization3);
+        $user1->own_organizations()->save($organization4);
+        $user1->organizations()->attach($organization1);
+        $user1->organizations()->attach($organization3);
+        $user1->organizations()->attach($organization4);
+
+        $user2->own_organizations()->save($organization2);
+        $user2->organizations()->attach($organization2);
+        $user2->organizations()->attach($organization4);
+
+        $response = $this->withHeader(
+            'Authorization', 'Bearer ' . $this->getToken()
+        )->json('GET', self::ENDPOINT_ORGANIZATION . '?user_id=' . $user2->id);
+
+        $response_data = json_decode($response->getContent())->data;
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response_data);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthorized_user_can_not_list_organizations()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->faker->word())
+            ->json('GET', self::ENDPOINT_ORGANIZATION);
+
+        $response->assertStatus(401);
+        $response->assertJsonPath('message', 'Unauthenticated.');
+    }
+
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Organization\StoreOrganizationRequest;
 use App\Http\Requests\Organization\UpdateOrganizationRequest;
+use App\Http\Resources\Organization\OrganizationCollection;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +14,74 @@ use OpenApi\Annotations as OA;
 
 class OrganizationController extends Controller
 {
+    /**
+     * List organizations
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     *
+     * @OA\Get(
+     *     path="/v1/organization",
+     *     operationId="listOrganizations",
+     *     description="List all organizations.",
+     *     tags={"Organizations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *          name="user_id",
+     *          in="query",
+     *          required=false,
+     *          description="User id related to the organization",
+     *          @OA\Schema(
+     *              type="int"
+     *          )
+     *     ),
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          required=false,
+     *          description="Page number for pagination",
+     *          @OA\Schema(
+     *              type="int"
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="List all organizations.",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->input();
+            $user_id = $filters['user_id'] ?? $request->user()->id;
+
+            $user = $request->user()->role === 'admin' ? User::find($user_id) : $request->user();
+
+            if (!$user) {
+                return response()->json(['message' => 'User not found.'], 404);
+            }
+
+            if ($user->role === 'admin' && !isset($filters['user_id'])) {
+                $organizations = Organization::where('active', true)->paginate(10);
+            } else {
+                $organizations = $user->organizations()->where('active', true)->paginate(10);
+            }
+
+            return (new OrganizationCollection($organizations))->response()->setStatusCode(200);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Store a new organization
      *
@@ -104,13 +173,13 @@ class OrganizationController extends Controller
             ]);
 
             $user->own_organizations()->save($organization);
+            $user->organizations()->attach($organization);
 
             return response()->json(
                 [
                     'message'         => 'Organization has been stored successfully.',
                     'organization_id' => $organization->id
-                ],
-                200
+                ], 200
             );
 
         } catch (\Throwable $e) {
