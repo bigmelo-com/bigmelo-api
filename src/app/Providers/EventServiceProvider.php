@@ -39,6 +39,7 @@ class EventServiceProvider extends ServiceProvider
          */
         'App\Events\Message\UserMessageStored' => [
             'App\Listeners\Message\GetChatGPTMessage',
+            'App\Listeners\Message\GetDataFromWhatsapp',
         ],
         'App\Events\Message\BigmeloMessageStored' => [
             'App\Listeners\Message\SendMessageToWhatsapp',
