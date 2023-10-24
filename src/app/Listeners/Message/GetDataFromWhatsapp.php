@@ -4,10 +4,14 @@ namespace App\Listeners\Message;
 
 use App\Classes\ChatGPT\ChatGPTClient;
 use App\Events\Message\UserMessageStored;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class GetDataFromWhatsapp
+class GetDataFromWhatsapp implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */
