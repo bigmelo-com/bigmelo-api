@@ -22,6 +22,7 @@ return [
             'user:store',
             'project:store-embeddings',
             'project:store',
+            'project:list',
             'organization:list',
             'organization:store'
         ]
@@ -30,8 +31,8 @@ return [
         'abilities' => [
             'message:store',
             'project:store',
-            'organization:list',
-            'organization:store'
+            'project:list',
+            'organization:list'
         ]
     ],
 

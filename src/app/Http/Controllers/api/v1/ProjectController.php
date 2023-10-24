@@ -5,11 +5,78 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
+use App\Http\Resources\Project\ProjectCollection;
+use App\Models\Organization;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+    /**
+     * List projects of an organization
+     *
+     * @param Request $request
+     * @param int $organization_id
+     *
+     * @return JsonResponse
+     *
+     * @OA\Get(
+     *     path="/v1/organization/{organization_id}/projects",
+     *     operationId="ListOrganizationProjects",
+     *     description="List organization projects.",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         description="ID of organization",
+     *         in="path",
+     *         name="organization_id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          required=false,
+     *          description="Page number for pagination",
+     *          @OA\Schema(
+     *              type="int"
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="List all projects.",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
+    public function index(Request $request, int $organization_id): JsonResponse
+    {
+        try {
+            $organization = Organization::find($organization_id);
+            $user = $organization->users()->find($request->user()->id);
+
+            if ($request->user()->role != 'admin' && !$user){
+                return response()->json(['message' => 'User is not related to the organization.'], 409);
+            }
+
+            $projects = $organization->projects()->paginate(10);
+
+            return (new ProjectCollection($projects))->response()->setStatusCode(200);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Store a new project.
      *
