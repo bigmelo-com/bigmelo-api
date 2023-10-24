@@ -7,6 +7,16 @@ class ChatGPTMessageResponse extends MessageResponse
     /**
      * @var string|null
      */
+    private ?string $function_call_name;
+
+    /**
+     * @var string|null
+     */
+    private ?string $function_call_arguments;
+
+    /**
+     * @var string|null
+     */
     private ?string $chatgpt_id;
 
     /**
@@ -45,6 +55,8 @@ class ChatGPTMessageResponse extends MessageResponse
      */
     public function __construct(
         string $content,
+        ?string $function_call_name = null,
+        ?string $function_call_arguments = null,
         ?string $chatgpt_id = null,
         ?string $object_type = null,
         ?string $model = null,
@@ -56,6 +68,8 @@ class ChatGPTMessageResponse extends MessageResponse
     {
         parent::__construct($content);
 
+        $this->function_call_name = $function_call_name;
+        $this->function_call_arguments = $function_call_arguments;
         $this->chatgpt_id = $chatgpt_id;
         $this->object_type = $object_type;
         $this->model = $model;
@@ -63,6 +77,26 @@ class ChatGPTMessageResponse extends MessageResponse
         $this->prompt_tokens = $prompt_tokens;
         $this->completion_tokens = $completion_tokens;
         $this->total_tokens = $total_tokens;
+    }
+
+    /**
+     * ChatGPT function call name
+     *
+     * @return string|null
+     */
+    public function getFunctionCallName(): ?string
+    {
+        return $this->function_call_name;
+    }
+
+    /**
+     * ChatGPT id
+     *
+     * @return string|null
+     */
+    public function getFunctionCallArguments(): ?string
+    {
+        return $this->function_call_arguments;
     }
 
     /**
