@@ -18,7 +18,7 @@ jobs:
     
     - name: Working directory
       run: ls -R 
-      working-directory: src
+      working-directory: ../src
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
     - uses: actions/checkout@v3
