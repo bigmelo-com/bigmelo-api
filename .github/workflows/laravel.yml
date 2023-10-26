@@ -10,13 +10,17 @@ jobs:
   laravel-tests:
 
     runs-on: ubuntu-latest
-    env: 
-      working-directory: ./src
 
     steps:
     - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
       with:
         php-version: '8.0'
+    
+    - name: Working directory
+      run: ls -R 
+      working-directory: ./src
+    - name: Directory Permissions
+      run: chmod -R 777 storage bootstrap/cache
     - uses: actions/checkout@v3
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
