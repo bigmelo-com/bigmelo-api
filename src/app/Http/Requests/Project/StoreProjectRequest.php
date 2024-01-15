@@ -23,7 +23,8 @@ class StoreProjectRequest extends FormRequest
             'assistant_knowledge_about' => 'required|string|min:20',
             'target_public'             => 'required|string|min:20',
             'language'                  => 'required|string|max:20',
-            'default_answer'            => 'required|string|min:20'
+            'default_answer'            => 'required|string|min:20',
+            'message_limit'             => 'required|numeric|integer'
         ];
     }
 }

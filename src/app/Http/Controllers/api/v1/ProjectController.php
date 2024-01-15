@@ -194,6 +194,7 @@ class ProjectController extends Controller
                 'target_public'             => $request->target_public ?? '',
                 'language'                  => $request->language ?? '',
                 'default_answer'            => $request->default_answer ?? '',
+                'message_limit'             => $request->message_limit
             ]);
 
             return response()->json(
@@ -325,6 +326,7 @@ class ProjectController extends Controller
             $project->target_public = $request->target_public ?? $project->target_public;
             $project->language = $request->language ?? $project->language;
             $project->default_answer = $request->default_answer ?? $project->default_answer;
+            $project->message_limit = $request->message_limit ?? $project->message_limit;
 
             $project->save();
 
