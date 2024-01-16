@@ -61,7 +61,7 @@ class GetChatGPTMessage implements ShouldQueue
                 );
             }
 
-            if($lead -> remaining_messages == 0){
+            if($lead->remaining_messages == 0){
                 $message = $message_repository->storeMessage(
                     lead_id: $lead_message->lead_id,
                     project_id: $lead_message->project_id,
