@@ -73,7 +73,7 @@ class GetChatGPTMessage implements ShouldQueue
 
                 Log::info(
                     "Listener: Get ChatGPT Message, " .
-                    "issue: Wrong media type sent from WhatsApp, " .
+                    "issue:" . config('bigmelo.message.no_available_messages') . ', ' .
                     "message_id: " . $message->id
                 );
                 
