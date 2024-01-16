@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\api\v1;
 
+use App\Models\Lead;
 use http\Client\Response;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Config;
@@ -80,8 +81,16 @@ class AuthControllerTest extends TestApi
         $response->assertJsonPath('user.country_code', '+57');
         $response->assertJsonPath('user.phone_number', '3248972647');
         $response->assertJsonPath('user.full_phone_number', '+573248972647');
-    }
 
+        $lead = Lead::find($response->json('user.id'));
+        $this->assertNotNull($lead);
+
+        $project = $lead->projects()->first();
+        $this->assertNotNull($project);
+        
+        $this->assertEquals($project->message_limit, $lead->remaining_messages);
+    }
+    
     /**
      * @test
      *

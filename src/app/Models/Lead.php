@@ -30,7 +30,8 @@ class Lead extends Model
         'city',
         'gender',
         'birthdate',
-        'active'
+        'active',
+        'remaining_messages'
     ];
 
     /**

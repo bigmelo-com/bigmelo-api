@@ -61,6 +61,25 @@ class GetChatGPTMessage implements ShouldQueue
                 );
             }
 
+            if($lead->remaining_messages == 0){
+                $message = $message_repository->storeMessage(
+                    lead_id: $lead_message->lead_id,
+                    project_id: $lead_message->project_id,
+                    content: config('bigmelo.message.no_available_messages'),
+                    source: 'Admin'
+                );
+
+                event(new BigmeloMessageStored($message));
+
+                Log::info(
+                    "Listener: Get ChatGPT Message, " .
+                    "issue:" . config('bigmelo.message.no_available_messages') . ', ' .
+                    "message_id: " . $message->id
+                );
+                
+               return;
+            }
+
             $chat = new ChatGPTClient();
 
             // Prompt to get new ChatGPT message

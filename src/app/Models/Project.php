@@ -29,7 +29,8 @@ class Project extends Model
         'language',
         'default_answer',
         'has_system_prompt',
-        'active'
+        'active',
+        'message_limit'
     ];
 
     /**
