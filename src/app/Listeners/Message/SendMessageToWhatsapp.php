@@ -3,6 +3,7 @@
 namespace App\Listeners\Message;
 
 use App\Classes\Twilio\TwilioClient;
+use App\Models\Lead;
 use App\Events\Message\BigmeloMessageStored;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -37,14 +38,17 @@ class SendMessageToWhatsapp implements ShouldQueue
 
         try {
             $twilio_client = new TwilioClient($project->phone_number);
-
             $twilio_client->sendMessageToWhatsapp($lead->full_phone_number, $bigmelo_message->content);
+
+            $lead->remaning_messages = $lead->remaning_messages > 0 ? $lead->remaning_messages - 1 : $lead->remaning_messages;
+            $lead->save();
 
             Log::info(
                 'Message sent to whatsapp, ' .
                 'from: ' . $project->phone_number . ', ' .
                 'to: ' . $lead->full_phone_number . ', ' .
-                'message_id: ' . $bigmelo_message->id
+                'message_id: ' . $bigmelo_message->id . ', ' .
+                'remaning_messages: ' . $lead->remaning_messages 
             );
 
         } catch (\Throwable $e) {

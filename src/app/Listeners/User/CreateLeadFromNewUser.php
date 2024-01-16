@@ -35,8 +35,10 @@ class CreateLeadFromNewUser
 
             $organization = Organization::where('name', 'Bigmelo')->first();
             $project = $organization->projects->first();
-
+            
             $lead->projects()->attach($project);
+            $lead->remaining_messages = $project->message_limit;
+            $lead->save();
 
             Log::info(
                 "Listener: CreateLeadFromNewUser, " .
