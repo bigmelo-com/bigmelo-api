@@ -35,6 +35,10 @@ Route::prefix('/user')->group(function() {
     Route::post('/{user_id}/messages-limit', 'App\Http\Controllers\api\v1\UserMessagesLimitController@store')->middleware(['auth:sanctum', 'abilities:user:store']);
 });
 
+Route::prefix('/profile')->group(function() {
+    Route::get('', 'App\Http\Controllers\api\v1\ProfileController@getProfileInfo')->middleware(['auth:sanctum', 'abilities:plan:get']);
+});
+
 Route::prefix('/project')->group(function() {
     Route::post('', 'App\Http\Controllers\api\v1\ProjectController@store')->middleware(['auth:sanctum', 'abilities:project:store']);
 

@@ -37,6 +37,7 @@ class ProjectControllerTest extends TestApi
             'target_public'             => $this->faker->text(200),
             'language'                  => $this->faker->word(),
             'default_answer'            => $this->faker->text(200),
+            'message_limit'             => -1,
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())

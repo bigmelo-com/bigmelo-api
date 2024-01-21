@@ -24,7 +24,8 @@ return [
             'project:store',
             'project:list',
             'organization:list',
-            'organization:store'
+            'organization:store',
+            'plan:get'
         ]
     ],
     'user' => [
@@ -32,7 +33,8 @@ return [
             'message:store',
             'project:store',
             'project:list',
-            'organization:list'
+            'organization:list',
+            'plan:get'
         ]
     ],
 
