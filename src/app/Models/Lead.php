@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lead extends Model
 {
@@ -31,6 +32,7 @@ class Lead extends Model
         'gender',
         'birthdate',
         'active',
+        'plan_id',
         'remaining_messages'
     ];
 
@@ -62,5 +64,15 @@ class Lead extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class, 'lead_id');
+    }
+
+     /**
+     * Lead's plan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class);
     }
 }

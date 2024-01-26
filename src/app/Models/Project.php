@@ -72,4 +72,14 @@ class Project extends Model
     {
         return $this->contents()->where('active', true)->first();
     }
+
+    /**
+     * Project plans
+     *
+     * @return HasMany
+     */
+    public function plans(): HasMany
+    {
+        return $this->hasMany(Plan::class);
+    }
 }
