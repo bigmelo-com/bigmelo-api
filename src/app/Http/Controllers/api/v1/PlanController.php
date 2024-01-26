@@ -11,6 +11,55 @@ use Illuminate\Http\Request;
 
 class PlanController extends Controller
 {
+    /**
+     * Store a new plan.
+     * 
+     * @OA\Post(
+     *     path="/projects/{project_id}/plans",
+     *     operationId="storePlan",
+     *     tags={"Plans"},
+     *     summary="Store a new plan for a project",
+     *     @OA\Parameter(
+     *         name="project_id",
+     *         in="path",
+     *         description="ID of the project",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="price", type="number"),
+     *             @OA\Property(property="message_limit", type="integer"),
+     *             @OA\Property(property="period", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Plan created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="plan_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Not authorized"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Plan already exists"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
+     */
     public function store(StorePlanRequest $request, int $project_id): JsonResponse
     {
         try {
