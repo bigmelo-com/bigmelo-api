@@ -31,7 +31,7 @@ class ProfileControllerTest extends TestApi
         $user = User::create([
             'role'              => 'user',
             'name'              => 'User',
-            'last_name'              => 'Test',
+            'last_name'         => 'Test',
             'email'             => 'test@test.com',
             'country_code'      => '+57',
             'phone_number'      => '3133777777',
@@ -42,7 +42,7 @@ class ProfileControllerTest extends TestApi
         event(new UserStored($user));
 
         $remaining_messages = $user->lead->remaining_messages;
-        $message_limit = $user->lead->projects->first()->message_limit;
+        $message_limit = $user->lead->plan ? $user->lead->plan->message_limit : $user->lead->projects->first()->message_limit;
         $used_messages = $message_limit - $remaining_messages;
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('test@test.com','test'))

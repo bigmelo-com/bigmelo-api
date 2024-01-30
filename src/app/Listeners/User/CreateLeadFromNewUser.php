@@ -5,6 +5,7 @@ namespace App\Listeners\User;
 use App\Events\User\UserStored;
 use App\Models\Lead;
 use App\Models\Organization;
+use App\Models\Plan;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -35,9 +36,11 @@ class CreateLeadFromNewUser
 
             $organization = Organization::where('name', 'Bigmelo')->first();
             $project = $organization->projects->first();
+            $plan = Plan::where('project_id', $project->id)->first();
             
             $lead->projects()->attach($project);
-            $lead->remaining_messages = $project->message_limit;
+            $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
+            $lead->plan_id = $plan ? $plan->id : null;
             $lead->save();
 
             Log::info(
@@ -45,7 +48,8 @@ class CreateLeadFromNewUser
                 "organization_id: " . $organization->id . ", " .
                 "project_id: " . $project->id . ", " .
                 "user_id: " . $user->id . ", " .
-                "lead_id: " . $lead->id
+                "lead_id: " . $lead->id . ", " .
+                "plan_id: " . $plan->id
             );
 
         } catch (\Throwable $e) {

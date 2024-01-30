@@ -25,7 +25,8 @@ return [
             'project:list',
             'organization:list',
             'organization:store',
-            'plan:get'
+            'plan:get',
+            'plan:store'
         ]
     ],
     'user' => [

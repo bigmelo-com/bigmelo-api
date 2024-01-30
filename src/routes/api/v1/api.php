@@ -46,6 +46,7 @@ Route::prefix('/project')->group(function() {
         Route::patch('', 'App\Http\Controllers\api\v1\ProjectController@update')->middleware(['auth:sanctum', 'abilities:project:store']);
         Route::post('/embeddings', 'App\Http\Controllers\api\v1\ProjectEmbeddingController@store_embeddings')->middleware(['auth:sanctum', 'abilities:project:store-embeddings']);
         Route::post('/content', 'App\Http\Controllers\api\v1\ProjectEmbeddingController@store')->middleware(['auth:sanctum', 'abilities:project:store']);
+        Route::post('/plan', 'App\Http\Controllers\api\v1\PlanController@store')->middleware(['auth:sanctum', 'abilities:plan:store']);
     });
 });
 
