@@ -36,7 +36,12 @@ Route::prefix('/user')->group(function() {
 });
 
 Route::prefix('/profile')->group(function() {
-    Route::get('', 'App\Http\Controllers\api\v1\ProfileController@getProfileInfo')->middleware(['auth:sanctum', 'abilities:plan:get']);
+    Route::get('', 'App\Http\Controllers\api\v1\ProfileController@getProfileInfo')->middleware(['auth:sanctum', 'abilities:profile:get']);
+});
+
+Route::prefix('/plan')->group(function() {
+    Route::post('', 'App\Http\Controllers\api\v1\PlanController@store')->middleware(['auth:sanctum', 'abilities:plan:store']);
+    Route::patch('/{plan_id}', 'App\Http\Controllers\api\v1\PlanController@update')->middleware(['auth:sanctum', 'abilities:plan:update']);
 });
 
 Route::prefix('/project')->group(function() {
@@ -46,7 +51,7 @@ Route::prefix('/project')->group(function() {
         Route::patch('', 'App\Http\Controllers\api\v1\ProjectController@update')->middleware(['auth:sanctum', 'abilities:project:store']);
         Route::post('/embeddings', 'App\Http\Controllers\api\v1\ProjectEmbeddingController@store_embeddings')->middleware(['auth:sanctum', 'abilities:project:store-embeddings']);
         Route::post('/content', 'App\Http\Controllers\api\v1\ProjectEmbeddingController@store')->middleware(['auth:sanctum', 'abilities:project:store']);
-        Route::post('/plan', 'App\Http\Controllers\api\v1\PlanController@store')->middleware(['auth:sanctum', 'abilities:plan:store']);
+        Route::get('/plan', 'App\Http\Controllers\api\v1\PlanController@index')->middleware(['auth:sanctum', 'abilities:plan:get']);
     });
 });
 

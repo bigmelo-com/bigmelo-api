@@ -14,6 +14,7 @@ class StorePlanRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'project_id'    => 'required|numeric|exists:projects,id',
             'name'          => 'required|string|max:255',
             'description'   => 'required|string|max:500',
             'price'         => 'required|numeric',

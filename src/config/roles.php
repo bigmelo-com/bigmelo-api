@@ -25,8 +25,10 @@ return [
             'project:list',
             'organization:list',
             'organization:store',
+            'profile:get',
+            'plan:store',
             'plan:get',
-            'plan:store'
+            'plan:update'
         ]
     ],
     'user' => [
@@ -35,6 +37,7 @@ return [
             'project:store',
             'project:list',
             'organization:list',
+            'profile:get',
             'plan:get'
         ]
     ],
