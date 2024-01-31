@@ -15,7 +15,8 @@ class ProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         $remaining_messages = $this->lead->remaining_messages;
-        $message_limit = $this->lead->plan ? $this->lead->plan->message_limit : $this->lead->projects->message_limit;
+        $message_limit = $this->lead->plan ? $this->lead->plan->message_limit : $this->lead->projects()->first()->message_limit;
+        
         $used_messages = $message_limit - $remaining_messages;
 
         return [
