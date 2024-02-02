@@ -25,6 +25,7 @@ class EventServiceProvider extends ServiceProvider
          */
         'App\Events\User\UserStored' => [
             'App\Listeners\User\CreateLeadFromNewUser',
+            'App\Listeners\User\SendWelcomeMessageToWhatsapp',
         ],
 
         /*
