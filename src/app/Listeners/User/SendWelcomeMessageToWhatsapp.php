@@ -3,8 +3,10 @@
 namespace App\Listeners\User;
 
 use App\Classes\Twilio\TwilioClient;
+use App\Events\Message\BigmeloMessageStored;
 use App\Events\User\UserStored;
 use App\Models\Project;
+use App\Repositories\MessageRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -33,24 +35,31 @@ class SendWelcomeMessageToWhatsapp implements ShouldQueue
     public function handle(UserStored $event): void
     {
         $project = Project::find(1);
-        $user = $event->new_user;
-        $twilio_welcome_template = "Hola {$user->name}! 🌟 Bienvenido a Bigmelo! 🚀 Estamos aquí con el poder de la inteligencia artificial para ayudarte. ¿En qué puedo asistirte hoy? 😊";
+        $lead = $event->new_user->lead;
+        $message_repository = new MessageRepository();
+        $twilio_welcome_template = "Hola {$lead->name}! 🌟 Bienvenido a Bigmelo! 🚀 Estamos aquí con el poder de la inteligencia artificial para ayudarte. ¿En qué puedo asistirte hoy? 😊";
 
         try {
-            $twilio_client = new TwilioClient($project->phone_number);
-            $twilio_client->sendMessageToWhatsapp($user->full_phone_number, $twilio_welcome_template);
+            $message = $message_repository->storeMessage(
+                lead_id: $lead->id,
+                project_id: $project->id,
+                content: $twilio_welcome_template,
+                source: 'Admin'
+            );
+
+            event(new BigmeloMessageStored($message));
 
             Log::info(
                 'Welcome message sent to whatsapp, ' .
                 'from: ' . $project->phone_number . ', ' .
-                'to: ' . $user->full_phone_number . ', '
+                'to: ' . $lead->full_phone_number . ', '
             );
 
         } catch (\Throwable $e) {
             Log::error(
                 'SendWelcomeMessageToWhatsapp: Internal error, ' .
                 'from: ' . $project->phone_number . ', ' .
-                'to: ' . $user->full_phone_number . ', ' .
+                'to: ' . $lead->full_phone_number . ', ' .
                 'error: ' . $e->getMessage()
             );
         }
