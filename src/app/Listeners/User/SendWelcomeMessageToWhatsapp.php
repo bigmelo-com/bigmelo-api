@@ -37,7 +37,7 @@ class SendWelcomeMessageToWhatsapp implements ShouldQueue
         $project = Project::find(1);
         $lead = $event->new_user->lead;
         $message_repository = new MessageRepository();
-        $twilio_welcome_template = "Hola {$lead->name}! 🌟 Bienvenido a Bigmelo! 🚀 Estamos aquí con el poder de la inteligencia artificial para ayudarte. ¿En qué puedo asistirte hoy? 😊";
+        $twilio_welcome_template = "Hola {$event->new_user->name}! 🌟 Bienvenido a Bigmelo! 🚀 Estamos aquí con el poder de la inteligencia artificial para ayudarte. ¿En qué puedo asistirte hoy? 😊";
 
         try {
             $message = $message_repository->storeMessage(
