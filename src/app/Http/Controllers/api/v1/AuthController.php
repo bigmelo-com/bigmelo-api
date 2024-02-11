@@ -111,6 +111,7 @@ class AuthController extends Controller
             $user->phone_number = $request->phone_number;
             $user->full_phone_number = $request->full_phone_number;
             $user->role = 'user';
+            $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
             $user->save();
 
             $user->refresh();

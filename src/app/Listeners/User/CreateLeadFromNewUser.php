@@ -2,7 +2,7 @@
 
 namespace App\Listeners\User;
 
-use App\Events\User\UserStored;
+use App\Events\User\UserValidated;
 use App\Models\Lead;
 use App\Models\Organization;
 use App\Models\Plan;
@@ -15,9 +15,9 @@ class CreateLeadFromNewUser
     /**
      * Handle the event.
      */
-    public function handle(UserStored $event): void
+    public function handle(UserValidated $event): void
     {
-        $user = $event->new_user;
+        $user = $event->user_validated;
 
         try {
             $lead = Lead::where('user_id', $user->id)->first();

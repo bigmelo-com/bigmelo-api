@@ -3,6 +3,7 @@
 namespace App\Classes\Twilio;
 
 use App\Exceptions\Twilio\TwilioClientCouldNotSendAMessageToWhatsappException;
+use App\Exceptions\Twilio\TwilioClientCouldNotSendASmsMessageException;
 use Twilio\Rest\Client;
 
 class TwilioClient
@@ -52,6 +53,35 @@ class TwilioClient
 
         } catch (\Throwable $e) {
             throw new TwilioClientCouldNotSendAMessageToWhatsappException(
+                'Error Twilio Client, ' .
+                'error: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Send a sms message
+     *
+     * @param string $phone_number
+     * @param string $message
+     *
+     * @return void
+     *
+     * @throws TwilioClientCouldNotSendAMessageToWhatsappException
+     */
+    public function sendSmsMessage(string $phone_number, string $message): void
+    {
+        try {
+            $this->client->messages->create(
+                $phone_number,
+                [
+                    'from' => $this->twilio_phone_number,
+                    'body' => $message
+                ]
+            );
+
+        } catch (\Throwable $e) {
+            throw new TwilioClientCouldNotSendASmsMessageException(
                 'Error Twilio Client, ' .
                 'error: ' . $e->getMessage()
             );

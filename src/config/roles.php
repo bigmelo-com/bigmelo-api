@@ -20,6 +20,7 @@ return [
             'message:store',
             'chats:get',
             'user:store',
+            'user:validate',
             'project:store-embeddings',
             'project:store',
             'project:list',
@@ -38,7 +39,8 @@ return [
             'project:list',
             'organization:list',
             'profile:get',
-            'plan:get'
+            'plan:get',
+            'user:validate'
         ]
     ],
 

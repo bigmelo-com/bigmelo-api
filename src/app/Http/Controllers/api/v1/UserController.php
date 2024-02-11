@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Events\User\UserStored;
+use App\Events\User\UserValidated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\ValidateUserRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
@@ -102,6 +105,35 @@ class UserController extends Controller
 
             return response()->json(
                 ['message' => 'User has been stored successfully.', 'user_id' => $user->id],
+                200
+            );
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+
+        }
+    }
+
+    public function validateUser(ValidateUserRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if(Carbon::now()->diffInMinutes($user->validation_code_sent_at) > 60){
+                return response()->json(['message' => 'There are not valid codes under your account, ask for new one.'], 403);
+            }
+
+            if($user->validation_code !== $request->validation_code){
+                return response()->json(['message' => 'Invalid code.'], 403);
+            }
+
+            $user->active = true;
+            $user->save();
+
+            event(new UserValidated($user));
+
+            return response()->json(
+                ['message' => 'User has been validated successfully.'],
                 200
             );
 
