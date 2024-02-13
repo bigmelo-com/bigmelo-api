@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers\api\v1;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserControllerTest
@@ -158,6 +159,120 @@ class UserControllerTest extends TestApi
 
         $response->assertStatus(401);
         $response->assertJsonPath('message', 'Unauthenticated.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function inactive_user_validation_successfully()
+    {
+        Event::fake();
+
+        User::create([
+            'role'              => 'inactive',
+            'active'            => false,
+            'name'              => 'User',
+            'last_name'         => 'Test',
+            'email'             => 'user@test.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test'),
+            'validation_code'   => '123456'
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('user@test.com','test'))
+            ->json('POST', self::ENDPOINT_USER . '/validate', ['validation_code' => '123456']);
+
+            $response->assertStatus(200);
+            $response->assertJsonPath('message', 'User has been validated successfully.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function inactive_user_validation_code_is_invalid()
+    {
+        Event::fake();
+
+        User::create([
+            'role'              => 'inactive',
+            'active'            => false,
+            'name'              => 'User',
+            'last_name'         => 'Test',
+            'email'             => 'user@test.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test'),
+            'validation_code'   => '123456'
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('user@test.com','test'))
+            ->json('POST', self::ENDPOINT_USER . '/validate', ['validation_code' => '000000']);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('message', 'Invalid code.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function not_inactive_user_can_not_validate_code()
+    {
+        Event::fake();
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('POST', self::ENDPOINT_USER . '/validate', ['validation_code' => '000000']);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('message', 'Not Authorized.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function inactive_user_create_validation_code_successfully()
+    {
+        User::create([
+            'role'              => 'inactive',
+            'active'            => false,
+            'name'              => 'User',
+            'last_name'         => 'Test',
+            'email'             => 'user@test.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test')
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken('user@test.com','test'))
+            ->json('PATCH', self::ENDPOINT_USER . '/validation-code', []);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'A new validation code was created successfully.');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthorized_user_create_validation_code_failed()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('PATCH', self::ENDPOINT_USER . '/validation-code', []);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('message', 'Not Authorized.');
     }
 
 }

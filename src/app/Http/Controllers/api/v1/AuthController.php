@@ -102,6 +102,17 @@ class AuthController extends Controller
     public function signUp(SignUpRequest $request): JsonResponse
     {
         try {
+            $user = User::where('email', $request->email)->where('full_phone_number', $request->full_phone_number)->where('active', true)->exists();
+
+            if($user){
+                return response()->json(
+                    [
+                        'message' => 'Email or phone number is already in use.',
+                    ],
+                    422
+                );
+            }
+
             $user = new User();
             $user->name = $request->name;
             $user->last_name = $request->last_name;
@@ -110,11 +121,11 @@ class AuthController extends Controller
             $user->country_code = $request->country_code;
             $user->phone_number = $request->phone_number;
             $user->full_phone_number = $request->full_phone_number;
-            $user->role = 'user';
+            $user->role = 'inactive';
             $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
+            $user->active = false;
             $user->save();
-
-            $user->refresh();
+            
             event(new UserStored($user));
 
             $token = $user->createToken('token-name', $user->getRoleAbilities());
@@ -122,7 +133,6 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'access_token' => $token->plainTextToken,
-                    'user' => $user,
                 ],
                 200
             );

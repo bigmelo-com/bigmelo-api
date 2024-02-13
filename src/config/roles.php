@@ -20,7 +20,6 @@ return [
             'message:store',
             'chats:get',
             'user:store',
-            'user:validate',
             'project:store-embeddings',
             'project:store',
             'project:list',
@@ -39,9 +38,14 @@ return [
             'project:list',
             'organization:list',
             'profile:get',
-            'plan:get',
-            'user:validate'
+            'plan:get'
         ]
     ],
+    'inactive' => [
+        'abilities' => [
+            'code:validate',
+            'code:get-validation-code'
+        ]
+    ]
 
 ];

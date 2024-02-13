@@ -10,6 +10,7 @@ use App\Http\Requests\User\ValidateUserRequest;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -113,11 +114,64 @@ class UserController extends Controller
 
         }
     }
-
+    
+    /**
+     * Validate a new user
+     *
+     * @param ValidateUserRequest $request
+     *
+     * @return JsonResponse
+     * 
+     * @OA\Post(
+     *     path="/v1/user/validate",
+     *     summary="Validate user",
+     *     description="Validate user with the provided validation code.",
+     *     tags={"Users"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Validation request data",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="validation_code", type="string", example="123456")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User validated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User has been validated successfully.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Invalid code or expired validation code",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Invalid code or expired validation code.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal Server Error.")
+     *         )
+     *     )
+     * )
+     * 
+     */
     public function validateUser(ValidateUserRequest $request): JsonResponse
     {
         try {
             $user = $request->user();
+            $user->refresh();
+
+            if($user->role !== 'inactive'){
+                return response()->json(
+                    [
+                        'message' => 'Not Authorized.',
+                    ],
+                    403
+                );
+            }
 
             if(Carbon::now()->diffInMinutes($user->validation_code_sent_at) > 60){
                 return response()->json(['message' => 'There are not valid codes under your account, ask for new one.'], 403);
@@ -128,12 +182,83 @@ class UserController extends Controller
             }
 
             $user->active = true;
+            $user->role = 'user';
+            $user->validation_code = null;
             $user->save();
 
             event(new UserValidated($user));
 
+            $token = $user->createToken('token-name', $user->getRoleAbilities());
+
             return response()->json(
-                ['message' => 'User has been validated successfully.'],
+                [
+                    'message' => 'User has been validated successfully.',
+                    'access_token' => $token->plainTextToken,
+                ],
+                200
+            );
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * 
+     * @OA\Patch(
+     *     path="/api/create-validation-code",
+     *     summary="Create Validation Code",
+     *     description="Create a new validation code for an inactive user.",
+     *     tags={"Users"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Validation code created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="A new validation code was created successfully.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Not Authorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Not Authorized.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal Server Error.")
+     *         )
+     *     )
+     * )
+     *
+     */
+    public function createValidationCode(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            $user->refresh();
+
+            if($user->role !== 'inactive'){
+                return response()->json(
+                    [
+                        'message' => 'Not Authorized.',
+                    ],
+                    403
+                );
+            }
+
+            $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
+            $user->save();
+
+            event(new UserStored($user));
+
+            return response()->json(
+                ['message' => 'A new validation code was created successfully.'],
                 200
             );
 
