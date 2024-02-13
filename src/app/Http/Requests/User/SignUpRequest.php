@@ -21,10 +21,10 @@ class SignUpRequest extends FormRequest
         return [
             'name'              => 'required|string',
             'last_name'         => 'required|string',
-            'email'             => 'required|email|unique:users',
+            'email'             => 'required|string|email',
             'password'          => 'required|string|min:8|confirmed',
             'country_code'      => 'required|string',
-            'phone_number'      => 'required|string|unique:users',
+            'phone_number'      => 'required|string',
             'full_phone_number' => 'required|string',
         ];
     }

@@ -30,7 +30,9 @@ class User extends Authenticatable
         'phone_number',
         'full_phone_number',
         'password',
-        'active'
+        'active',
+        'validation_code',
+        'validation_code_sent_at'
     ];
 
     /**

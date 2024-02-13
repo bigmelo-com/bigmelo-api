@@ -9,7 +9,8 @@ return [
         'token' => env('TWILIO_TOKEN'),
     ],
     'message' => [
-        'no_available_messages' => env('NO_AVILABLE_MESSAGES', 'Ha excedido el límite de mensajes o su límite es cero.'),
-        'wrong_media_type'      => 'El archivo adjunto no se puede procesar'
+        'no_available_messages'     => env('NO_AVILABLE_MESSAGES', 'Ha excedido el límite de mensajes o su límite es cero.'),
+        'wrong_media_type'          => 'El archivo adjunto no se puede procesar',
+        'validation_code_message'   => env('VALIDATION_CODE_MESSAGE', 'Tu código de validación de Bigmelo es: '),
     ],
 ];

@@ -41,5 +41,11 @@ return [
             'plan:get'
         ]
     ],
+    'inactive' => [
+        'abilities' => [
+            'code:validate',
+            'code:get-validation-code'
+        ]
+    ]
 
 ];

@@ -90,18 +90,73 @@ class AuthController extends Controller
     }
 
     /**
-     * New user signup.
+     * Register new user.
      *
      * @param SignUpRequest $request
-     *
      * @return JsonResponse
-     *
-     * @throws ValidationException
-     * @throws Exception
+     * 
+     * @OA\Post(
+     *     path="/v1/auth/signup",
+     *     tags={"Auth"},
+     *     summary="Sign up a new user",
+     *     description="Creates a new user account with specified credentials and returns an access token if successful.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User signup details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="John Doe", description="The user's full name"),
+     *             @OA\Property(property="last_name", type="string", example="Smith", description="The user's last name"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com", description="The user's email address"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123", description="The user's password"),
+     *             @OA\Property(property="country_code", type="string", example="US", description="The user's country code"),
+     *             @OA\Property(property="phone_number", type="string", example="1234567890", description="The user's phone number"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful signup",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="access_token", type="string"),
+     *             @OA\Property(property="token_type", type="string", example="bearer"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Email or phone number already in use",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Email or phone number is already in use.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function signUp(SignUpRequest $request): JsonResponse
     {
         try {
+            $user = User::where('email', $request->email)->where('full_phone_number', $request->full_phone_number)->where('active', true)->exists();
+
+            if($user){
+                return response()->json(
+                    [
+                        'message' => 'Email or phone number is already in use.',
+                    ],
+                    422
+                );
+            }
+
             $user = new User();
             $user->name = $request->name;
             $user->last_name = $request->last_name;
@@ -110,10 +165,11 @@ class AuthController extends Controller
             $user->country_code = $request->country_code;
             $user->phone_number = $request->phone_number;
             $user->full_phone_number = $request->full_phone_number;
-            $user->role = 'user';
+            $user->role = 'inactive';
+            $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
+            $user->active = false;
             $user->save();
-
-            $user->refresh();
+            
             event(new UserStored($user));
 
             $token = $user->createToken('token-name', $user->getRoleAbilities());
@@ -121,7 +177,6 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'access_token' => $token->plainTextToken,
-                    'user' => $user,
                 ],
                 200
             );
