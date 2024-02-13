@@ -90,23 +90,28 @@ class AuthController extends Controller
     }
 
     /**
+     * Register new user.
+     *
+     * @param SignUpRequest $request
+     * @return JsonResponse
+     * 
      * @OA\Post(
      *     path="/v1/auth/signup",
      *     tags={"Auth"},
      *     summary="Sign up a new user",
      *     description="Creates a new user account with specified credentials and returns an access token if successful.",
      *     @OA\RequestBody(
- *         required=true,
- *         description="User signup details",
- *         @OA\JsonContent(
- *             @OA\Property(property="name", type="string", example="John Doe", description="The user's full name"),
- *             @OA\Property(property="last_name", type="string", example="Smith", description="The user's last name"),
- *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com", description="The user's email address"),
- *             @OA\Property(property="password", type="string", format="password", example="password123", description="The user's password"),
- *             @OA\Property(property="country_code", type="string", example="US", description="The user's country code"),
- *             @OA\Property(property="phone_number", type="string", example="1234567890", description="The user's phone number"),
- *         )
- *     ),
+     *         required=true,
+     *         description="User signup details",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="John Doe", description="The user's full name"),
+     *             @OA\Property(property="last_name", type="string", example="Smith", description="The user's last name"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com", description="The user's email address"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123", description="The user's password"),
+     *             @OA\Property(property="country_code", type="string", example="US", description="The user's country code"),
+     *             @OA\Property(property="phone_number", type="string", example="1234567890", description="The user's phone number"),
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful signup",
