@@ -169,6 +169,8 @@ class AuthController extends Controller
             $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
             $user->active = false;
             $user->save();
+
+            User::where('id', '!=', $user->id)->where('validation_code', '!=', null)->update(['validation_code' => null]);
             
             event(new UserStored($user));
 
