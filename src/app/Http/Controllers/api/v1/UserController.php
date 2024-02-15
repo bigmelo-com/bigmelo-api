@@ -164,7 +164,7 @@ class UserController extends Controller
             $user = $request->user();
             $user->refresh();
 
-            if($user->role !== 'inactive'){
+            if($user->role !== 'inactive' || User::where('email', $user->email)->whereOr('full_phone_number', $user->full_phone_number)->where('active', true)->exists()){
                 return response()->json(
                     [
                         'message' => 'Not Authorized.',
@@ -192,8 +192,8 @@ class UserController extends Controller
 
             return response()->json(
                 [
-                    'message' => 'User has been validated successfully.',
-                    'access_token' => $token->plainTextToken,
+                    'message'       => 'User has been validated successfully.',
+                    'access_token'  => $token->plainTextToken
                 ],
                 200
             );
@@ -243,7 +243,7 @@ class UserController extends Controller
             $user = $request->user();
             $user->refresh();
 
-            if($user->role !== 'inactive'){
+            if($user->role !== 'inactive' || User::where('email', $user->email)->whereOr('full_phone_number', $user->full_phone_number)->where('active', true)->exists()){
                 return response()->json(
                     [
                         'message' => 'Not Authorized.',
