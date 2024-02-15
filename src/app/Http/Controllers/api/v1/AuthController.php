@@ -146,7 +146,7 @@ class AuthController extends Controller
     public function signUp(SignUpRequest $request): JsonResponse
     {
         try {
-            $user = User::where('email', $request->email)->where('full_phone_number', $request->full_phone_number)->where('active', true)->exists();
+            $user = User::where('email', $request->email)->whereOr('full_phone_number', $request->full_phone_number)->where('active', true)->exists();
 
             if($user){
                 return response()->json(
@@ -156,6 +156,8 @@ class AuthController extends Controller
                     422
                 );
             }
+
+            User::where('email', $request->email)->whereOr('full_phone_number', $request->full_phone_number)->update(['validation_code' => null]);
 
             $user = new User();
             $user->name = $request->name;
@@ -169,8 +171,6 @@ class AuthController extends Controller
             $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
             $user->active = false;
             $user->save();
-
-            User::where('id', '!=', $user->id)->where('validation_code', '!=', null)->update(['validation_code' => null]);
             
             event(new UserStored($user));
 

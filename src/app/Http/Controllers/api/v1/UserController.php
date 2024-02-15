@@ -164,7 +164,7 @@ class UserController extends Controller
             $user = $request->user();
             $user->refresh();
 
-            if($user->role !== 'inactive' || User::where('email', $user->email)->where('full_phone_number', $user->full_phone_number)->where('active', true)->exists()){
+            if($user->role !== 'inactive' || User::where('email', $user->email)->whereOr('full_phone_number', $user->full_phone_number)->where('active', true)->exists()){
                 return response()->json(
                     [
                         'message' => 'Not Authorized.',
@@ -243,7 +243,7 @@ class UserController extends Controller
             $user = $request->user();
             $user->refresh();
 
-            if($user->role !== 'inactive' || User::where('email', $user->email)->where('full_phone_number', $user->full_phone_number)->where('active', true)->exists()){
+            if($user->role !== 'inactive' || User::where('email', $user->email)->whereOr('full_phone_number', $user->full_phone_number)->where('active', true)->exists()){
                 return response()->json(
                     [
                         'message' => 'Not Authorized.',
