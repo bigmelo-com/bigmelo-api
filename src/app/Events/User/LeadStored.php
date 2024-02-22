@@ -2,7 +2,7 @@
 
 namespace App\Events\User;
 
-use App\Models\User;
+use App\Models\Lead;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,31 +12,27 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class UserValidated
+class LeadStored
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * New user validated.
+     * New lead stored.
      *
-     * @var User
+     * @var Lead
      */
-    public User $user_validated;
+    public Lead $lead;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user_validated
-     *
-     * @return void
      */
-    public function __construct(User $user_validated)
+    public function __construct(Lead $lead)
     {
-        $this->user_validated = $user_validated;
+        $this->lead = $lead;
 
         Log::info(
-            "Event: User validated, " .
-            "user_id: " . $user_validated->id
+            "Event: Lead stored, " .
+            "lead_id: " . $lead->id
         );
     }
 }

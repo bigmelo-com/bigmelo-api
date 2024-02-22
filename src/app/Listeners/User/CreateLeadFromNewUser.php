@@ -2,6 +2,7 @@
 
 namespace App\Listeners\User;
 
+use App\Events\User\LeadStored;
 use App\Events\User\UserValidated;
 use App\Models\Lead;
 use App\Models\Organization;
@@ -42,6 +43,8 @@ class CreateLeadFromNewUser
             $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
             $lead->plan_id = $plan ? $plan->id : null;
             $lead->save();
+
+            event(new LeadStored($lead));
 
             Log::info(
                 "Listener: CreateLeadFromNewUser, " .

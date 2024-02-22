@@ -7,7 +7,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use App\Classes\Twilio\TwilioClient;
 use Illuminate\Support\Facades\Log;
 use App\Events\User\UserStored;
-use App\Events\User\UserValidated;
 use App\Models\Project;
 use Carbon\Carbon;
 

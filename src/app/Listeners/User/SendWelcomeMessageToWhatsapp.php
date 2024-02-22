@@ -2,9 +2,8 @@
 
 namespace App\Listeners\User;
 
-use App\Classes\Twilio\TwilioClient;
 use App\Events\Message\BigmeloMessageStored;
-use App\Events\User\UserValidated;
+use App\Events\User\LeadStored;
 use App\Models\Project;
 use App\Repositories\MessageRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,12 +31,12 @@ class SendWelcomeMessageToWhatsapp implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(UserValidated $event): void
+    public function handle(LeadStored $event): void
     {
         $project = Project::find(1);
-        $lead = $event->user_validated->lead;
+        $lead = $event->lead;
         $message_repository = new MessageRepository();
-        $twilio_welcome_template = "Hola {$event->user_validated->name}! 🌟 Bienvenido a Bigmelo! 🚀 Estamos aquí con el poder de la inteligencia artificial para ayudarte. ¿En qué puedo asistirte hoy? 😊";
+        $twilio_welcome_template = "Hola {$event->lead->name}! 🌟 Bienvenido a Bigmelo! 🚀 Estamos aquí con el poder de la inteligencia artificial para ayudarte. ¿En qué puedo asistirte hoy? 😊";
 
         try {
             $message = $message_repository->storeMessage(

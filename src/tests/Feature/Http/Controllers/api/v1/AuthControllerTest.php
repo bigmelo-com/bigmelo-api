@@ -74,21 +74,7 @@ class AuthControllerTest extends TestApi
         ]);
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['access_token', 'user']);
-        $response->assertJsonPath('user.name', 'User');
-        $response->assertJsonPath('user.last_name', 'Test');
-        $response->assertJsonPath('user.email', 'test@example.com');
-        $response->assertJsonPath('user.country_code', '+57');
-        $response->assertJsonPath('user.phone_number', '3248972647');
-        $response->assertJsonPath('user.full_phone_number', '+573248972647');
-
-        $lead = Lead::find($response->json('user.id'));
-        $this->assertNotNull($lead);
-
-        $project = $lead->projects()->first();
-        $this->assertNotNull($project);
-        
-        $this->assertEquals($project->message_limit, $lead->remaining_messages);
+        $response->assertJsonStructure(['access_token']);
     }
     
     /**

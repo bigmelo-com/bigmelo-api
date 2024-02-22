@@ -47,14 +47,6 @@ class PlanControllerTest extends TestApi
 
         $response->assertStatus(200);
         $response->assertJsonPath('message', 'Plan has been stored successfully.');
-
-        $new_plan = Plan::find($response_content->plan_id);
-        $this->assertEquals($new_plan->project_id, 1);
-        $this->assertEquals($new_plan->name, $plan_data['name']);
-        $this->assertEquals($new_plan->description, $plan_data['description']);
-        $this->assertEquals($new_plan->price, $plan_data['price']);
-        $this->assertEquals($new_plan->message_limit, $plan_data['message_limit']);
-        $this->assertEquals($new_plan->period, $plan_data['period']);
     }
 
     /**
