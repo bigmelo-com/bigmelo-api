@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\api\v1;
 
 use App\Events\User\UserStored;
+use App\Events\User\UserValidated;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
@@ -39,7 +40,7 @@ class ProfileControllerTest extends TestApi
             'password'          => Hash::make('test')
         ]);
 
-        event(new UserStored($user));
+        event(new UserValidated($user));
 
         $remaining_messages = $user->lead->remaining_messages;
         $message_limit = $user->lead->plan ? $user->lead->plan->message_limit : $user->lead->projects->first()->message_limit;

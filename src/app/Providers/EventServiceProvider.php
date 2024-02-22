@@ -27,8 +27,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\User\SendValidationCode',
         ],
         'App\Events\User\UserValidated' => [
-            'App\Listeners\User\SendWelcomeMessageToWhatsapp',
             'App\Listeners\User\CreateLeadFromNewUser',
+        ],
+        'App\Events\User\LeadStored' => [
+            'App\Listeners\User\SendWelcomeMessageToWhatsapp',
         ],
 
         /*
