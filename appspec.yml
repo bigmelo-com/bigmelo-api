@@ -7,3 +7,5 @@ file_exists_behavior: OVERWRITE
 hooks:
   BeforeInstall:
     - location: scripts/stop-queue.sh
+  AfterInstall:
+    - location: scripts/start-queue.sh
