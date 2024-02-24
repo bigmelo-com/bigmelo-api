@@ -3,3 +3,8 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/bigmelo-api
+hooks:
+  BeforeInstall:
+    - location: scripts/stop-queue.sh
+      timeout:
+      runas: 
