@@ -7,6 +7,9 @@ file_exists_behavior: OVERWRITE
 hooks:
   BeforeInstall:
     - location: scripts/stop-queue.sh
+    - timeout: 60
+    - runas: ubuntu
   AfterInstall:
     - location: scripts/start-queue.sh
-    - timeout: 300
+    - timeout: 60
+    - runas: ubuntu
