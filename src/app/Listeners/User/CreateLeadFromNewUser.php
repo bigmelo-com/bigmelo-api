@@ -21,7 +21,7 @@ class CreateLeadFromNewUser
         $user = $event->user_validated;
 
         try {
-            $lead = Lead::where('user_id', $user->id)->first();
+            $lead = Lead::where('full_phone_number', $user->full_phone_number)->orWhere('user_id', $user->id)->first();
 
             if (!$lead) {
                 $lead = Lead::create([
@@ -33,7 +33,14 @@ class CreateLeadFromNewUser
                     'phone_number' => $user->phone_number,
                     'full_phone_number' => $user->full_phone_number,
                 ]);
+            } else {
+                $lead->user_id = $user->id;
+                $lead->first_name = $user->name;
+                $lead->last_name = $user->last_name;
+                $lead->email = $user->email;
+                $lead->save();
             }
+
 
             $organization = Organization::where('name', 'Bigmelo')->first();
             $project = $organization->projects->first();
