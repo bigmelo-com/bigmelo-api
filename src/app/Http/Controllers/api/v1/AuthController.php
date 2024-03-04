@@ -5,9 +5,6 @@ namespace App\Http\Controllers\api\v1;
 use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\SignUpRequest;
-use App\Models\Lead;
-use App\Models\Organization;
-use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -174,12 +171,6 @@ class AuthController extends Controller
             $user->validation_code = str_pad(rand(1, 999999), 6, "0", STR_PAD_LEFT);
             $user->active = false;
             $user->save();
-
-            $lead = Lead::create([
-                'country_code'      => "+57",
-                'phone_number'      => $request->phone_number,
-                'full_phone_number' => $request->full_phone_number,
-            ]);
             
             event(new UserStored($user));
 
