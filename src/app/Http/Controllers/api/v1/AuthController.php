@@ -151,7 +151,7 @@ class AuthController extends Controller
             if($user){
                 return response()->json(
                     [
-                        'message' => 'Email or phone number is already in use.',
+                        'message'   => 'Email or phone number is already in use.'
                     ],
                     422
                 );
