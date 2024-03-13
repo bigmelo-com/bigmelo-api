@@ -44,7 +44,7 @@ class CreateLeadFromNewUser
                 $lead->plan_id = $plan ? $plan->id : null;
                 $lead->save();
                
-            } elseif(!$lead->user_id) {
+            } elseif (!$lead->user_id) {
                 $lead->user_id = $user->id;
                 $lead->first_name = $user->name;
                 $lead->last_name = $user->last_name;
