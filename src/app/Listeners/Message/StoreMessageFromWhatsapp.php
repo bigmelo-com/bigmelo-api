@@ -61,10 +61,11 @@ class StoreMessageFromWhatsapp
                     'country_code'          => substr($from_number, 0, -10),
                     'phone_number'          => substr($from_number, -10),
                     'full_phone_number'     => $from_number,
-                    'remaining_messages'    => config('bigmelo.mesage.limit'),
                 ]);
 
                 $lead->projects()->attach($project);
+                $lead->remaining_messages = config('not_registered_user_message_limit' ,5);
+                $lead->save();
             }
 
             $message = $message_repository->storeMessage(
