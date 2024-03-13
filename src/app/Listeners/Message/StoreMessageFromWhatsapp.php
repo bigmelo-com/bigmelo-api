@@ -58,9 +58,10 @@ class StoreMessageFromWhatsapp
 
             if (!$lead) {
                 $lead = Lead::create([
-                    'country_code'      => substr($from_number, 0, -10),
-                    'phone_number'      => substr($from_number, -10),
-                    'full_phone_number' => $from_number,
+                    'country_code'          => substr($from_number, 0, -10),
+                    'phone_number'          => substr($from_number, -10),
+                    'full_phone_number'     => $from_number,
+                    'remaining_messages'    => config('bigmelo.mesage.limit'),
                 ]);
 
                 $lead->projects()->attach($project);

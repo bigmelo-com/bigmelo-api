@@ -62,18 +62,30 @@ class GetChatGPTMessage implements ShouldQueue
             }
 
             if($lead->remaining_messages == 0){
-                $message = $message_repository->storeMessage(
-                    lead_id: $lead_message->lead_id,
-                    project_id: $lead_message->project_id,
-                    content: config('bigmelo.message.no_available_messages'),
-                    source: 'Admin'
-                );
+                $issue = "No hay mas mensajes disponibles";
+                if($lead->user_id){
+                    $message = $message_repository->storeMessage(
+                        lead_id: $lead_message->lead_id,
+                        project_id: $lead_message->project_id,
+                        content: config('bigmelo.message.no_available_messages'),
+                        source: 'Admin'
+                    );
+                    $issue = config('bigmelo.message.no_available_messages');
+                } else {
+                    $message = $message_repository->storeMessage(
+                        lead_id: $lead_message->lead_id,
+                        project_id: $lead_message->project_id,
+                        content: config('bigmelo.message.no_available_messages_unregistered_user'),
+                        source: 'Admin'
+                    );
+                    $issue = config('bigmelo.message.no_available_messages_unregistered_user');
+                }
 
                 event(new BigmeloMessageStored($message));
 
                 Log::info(
                     "Listener: Get ChatGPT Message, " .
-                    "issue:" . config('bigmelo.message.no_available_messages') . ', ' .
+                    "issue:" . $issue . ', ' .
                     "message_id: " . $message->id
                 );
                 
