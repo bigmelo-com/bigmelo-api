@@ -38,17 +38,21 @@ class CreateLeadFromNewUser
                     'phone_number' => $user->phone_number,
                     'full_phone_number' => $user->full_phone_number,
                 ]);
+                $lead->projects()->attach($project);
+                $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
+                $lead->plan_id = $plan ? $plan->id : null;
+                $lead->save();
+
             } elseif (!$lead->user_id) {
                 $lead->user_id = $user->id;
                 $lead->first_name = $user->name;
                 $lead->last_name = $user->last_name;
                 $lead->email = $user->email;
+                $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
+                $lead->plan_id = $plan ? $plan->id : null;
+                $lead->save();
             }
             
-            $lead->projects()->attach($project);
-            $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
-            $lead->plan_id = $plan ? $plan->id : null;
-            $lead->save();
 
             event(new LeadStored($lead));
 
