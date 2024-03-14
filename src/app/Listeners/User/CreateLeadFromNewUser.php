@@ -26,7 +26,7 @@ class CreateLeadFromNewUser
             $plan = Plan::where('project_id', $project->id)->first();
             $lead = Lead::whereHas('projects', function ($q) use($project) {
                     $q->where('project_id', $project->id);
-                })->where('full_phone_number', $user->full_phone_number)->where('user_id', $user->id)->first();
+                })->where('full_phone_number', $user->full_phone_number)->orWhere('user_id', $user->id)->first();
 
             if (!$lead) {
                 $lead = Lead::create([
