@@ -79,6 +79,19 @@ class PlanController extends Controller
         }
     }
 
+    public function getLeadPlans(Request $request): JsonResponse
+    {
+        try {
+            $project = $request->user()->lead->projects->first();
+            $plans = $project->plans()->paginate(10);
+
+            return (new PlanCollection($plans))->response()->setStatusCode(200);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Store a new plan.
      * 
