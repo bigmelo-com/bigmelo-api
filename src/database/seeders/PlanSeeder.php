@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Lead;
 use App\Models\Plan;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 
@@ -24,10 +23,10 @@ class PlanSeeder extends Seeder
                 $plan = Plan::create([
                     'project_id'    => $project->id,
                     'name'          => 'Bigmelo',
-                    'description'   => 'First plan.',
-                    'price'         => 0,
-                    'message_limit' => 20,
-                    'period'        => '1d, 1w, 1m, 1y',
+                    'description'   => 'Obten mensajes ilimitados durante un mes',
+                    'price'         => 5.70,
+                    'message_limit' => -1,
+                    'period'        => '0d, 0w, 1m, 0y',
                 ]);
             }
 

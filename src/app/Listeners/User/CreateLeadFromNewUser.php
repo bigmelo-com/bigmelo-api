@@ -23,7 +23,6 @@ class CreateLeadFromNewUser
         try {
             $organization = Organization::where('name', 'Bigmelo')->first();
             $project = $organization->projects->first();
-            $plan = Plan::where('project_id', $project->id)->first();
             $lead = Lead::whereHas('projects', function ($q) use($project) {
                     $q->where('project_id', $project->id);
                 })->where('full_phone_number', $user->full_phone_number)->orWhere('user_id', $user->id)->first();
@@ -39,8 +38,7 @@ class CreateLeadFromNewUser
                     'full_phone_number' => $user->full_phone_number,
                 ]);
                 $lead->projects()->attach($project);
-                $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
-                $lead->plan_id = $plan ? $plan->id : null;
+                $lead->remaining_messages = $project->message_limit;
                 $lead->save();
 
             } elseif (!$lead->user_id) {
@@ -48,8 +46,7 @@ class CreateLeadFromNewUser
                 $lead->first_name = $user->name;
                 $lead->last_name = $user->last_name;
                 $lead->email = $user->email;
-                $lead->remaining_messages = $plan ? $plan->message_limit : $project->message_limit;
-                $lead->plan_id = $plan ? $plan->id : null;
+                $lead->remaining_messages = $project->message_limit;
                 $lead->save();
             }
             
