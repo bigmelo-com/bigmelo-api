@@ -28,7 +28,8 @@ return [
             'profile:get',
             'plan:store',
             'plan:get',
-            'plan:update'
+            'plan:update',
+            'plan:purchase',
         ]
     ],
     'user' => [
@@ -38,7 +39,8 @@ return [
             'project:list',
             'organization:list',
             'profile:get',
-            'plan:get'
+            'plan:get',
+            'plan:purchase',
         ]
     ],
     'inactive' => [

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\api\v1;
 
 use App\Events\User\UserStored;
+use App\Events\User\UserValidated;
 use App\Models\Plan;
 use App\Models\Project;
 use App\Models\User;
@@ -42,8 +43,6 @@ class PlanControllerTest extends TestApi
         $response = $this->withHeader(
             'Authorization', 'Bearer ' . $this->getToken()
         )->json('POST', self::ENDPOINT_PLAN, $plan_data);
-
-        $response_content = json_decode($response->getContent());
 
         $response->assertStatus(200);
         $response->assertJsonPath('message', 'Plan has been stored successfully.');
@@ -285,5 +284,35 @@ class PlanControllerTest extends TestApi
         
         $response->assertStatus(403);
         $response->assertJsonPath('message', 'Not Authorized');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_can_get_lead_available_plans(): void
+    {
+        $user = User::create([
+            'role'              => 'user',
+            'name'              => 'User',
+            'last_name'         => 'Test',
+            'email'             => 'user@test.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test'),
+            'active'            => true,
+            'validation_code'   => null
+        ]);
+
+        event(new UserValidated($user));
+
+        $response = $this->withHeader(
+            'Authorization', 'Bearer ' . $this->getToken('user@test.com','test')
+        )->json('GET', self::ENDPOINT_PLAN . '/purchase');
+        
+        $response->assertStatus(200);
+        // $response->assertJsonPath('message', 'Not Authorized');
     }
 }

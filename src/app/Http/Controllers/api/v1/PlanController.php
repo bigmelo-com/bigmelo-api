@@ -79,6 +79,56 @@ class PlanController extends Controller
         }
     }
 
+
+    /**
+    * Get a list of plans for the lead's project.
+    *
+    * @OA\Get(
+    *     path="/v1/plan/purchase",
+    *     operationId="getLeadPlans",
+    *     tags={"Plan"},
+    *     summary="Get a list of plans for the lead's project",
+    *     @OA\Response(
+    *         response=200,
+    *         description="Successful operation",
+    *         @OA\JsonContent(
+    *             type="array",
+    *             @OA\Items(
+    *                 type="object",
+    *                 @OA\Property(property="id", type="integer"),
+    *                 @OA\Property(property="project_id", type="integer"),
+    *                 @OA&lt;3>Property(property="name", type="string"),
+    *                 @OA\Property(property="description", type="string"),
+    *                 @OA\Property(property="price", type="number"),
+    *                 @OA\Property(property="message_limit", type="integer"),
+    *                 @OA\Property(property="period", type="string"),
+    *                 @OA\Property(property="created_at", type="string", format="date-time"),
+    *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+    *             )
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=500,
+    *         description="Internal server error",
+    *          @OA\JsonContent(
+    *             @OA\Property(property="message", type="string")
+    *         )
+    *     )
+    * )
+    */
+    public function getLeadPlans(Request $request): JsonResponse
+    {
+        try {
+            $project = $request->user()->lead->projects->first();
+            $plans = $project->plans()->paginate(10);
+
+            return (new PlanCollection($plans))->response()->setStatusCode(200);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Store a new plan.
      * 
