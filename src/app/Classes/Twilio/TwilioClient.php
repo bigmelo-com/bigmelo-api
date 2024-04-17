@@ -3,7 +3,6 @@
 namespace App\Classes\Twilio;
 
 use App\Exceptions\Twilio\TwilioClientCouldNotSendAMessageToWhatsappException;
-use App\Exceptions\Twilio\TwilioClientCouldNotSendASmsMessageException;
 use Twilio\Rest\Client;
 
 class TwilioClient

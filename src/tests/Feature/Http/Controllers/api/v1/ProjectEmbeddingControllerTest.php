@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -118,7 +119,7 @@ class ProjectEmbeddingControllerTest extends TestApi
             'country_code'      => '+57',
             'phone_number'      => '3131234567',
             'full_phone_number' => '+573131234567',
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ]);
 
         $file = UploadedFile::fake()->create('test.txt', 1024);
@@ -145,7 +146,7 @@ class ProjectEmbeddingControllerTest extends TestApi
             'country_code'      => '+57',
             'phone_number'      => '3131234567',
             'full_phone_number' => '+573131234567',
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ]);
 
         $user_owner = User::create([
@@ -155,7 +156,7 @@ class ProjectEmbeddingControllerTest extends TestApi
             'country_code'      => '+57',
             'phone_number'      => '3130000000',
             'full_phone_number' => '+573130000000',
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ]);
         $lead = Lead::create([
             'user_id'           => $user_owner->id,
@@ -209,7 +210,7 @@ class ProjectEmbeddingControllerTest extends TestApi
             'country_code'      => '+57',
             'phone_number'      => '3131234567',
             'full_phone_number' => '+573131234567',
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ]);
 
         $file = UploadedFile::fake()->create('test.pdf', 1024);

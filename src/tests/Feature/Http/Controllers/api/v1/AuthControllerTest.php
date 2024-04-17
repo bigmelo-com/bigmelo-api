@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\api\v1;
 
 use App\Models\Lead;
+use App\Models\User;
 use http\Client\Response;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Config;

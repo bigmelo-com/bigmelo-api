@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers\api\v1;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserMessagesLimitControllerTest
@@ -56,7 +57,7 @@ class UserMessagesLimitControllerTest extends TestApi
             'country_code'      => $country_code,
             'phone_number'      => $phone_number,
             'full_phone_number' => $full_phone_number,
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ];
 
         $user = User::create($user_data);

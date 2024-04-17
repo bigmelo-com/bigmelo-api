@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\v1;
 
+use App\Classes\MercadoPago\MercadoPagoClient;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Project\StorePlanRequest;
 use App\Http\Requests\Project\UpdatePlanRequest;
@@ -123,6 +124,39 @@ class PlanController extends Controller
             $plans = $project->plans()->paginate(10);
 
             return (new PlanCollection($plans))->response()->setStatusCode(200);
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getPreferenceId(Request $request , int $plan_id): JsonResponse
+    {
+        try {
+            $project = $request->user()->lead->projects->first();
+            $available_plan = $project->plans->find($plan_id);
+            
+            if(!$available_plan) {
+                return response()->json([
+                    'message' => 'This plan does not exist'
+                ], 404);
+            }
+            
+            $mercado_pago_client = new MercadoPagoClient();
+            $preference = $mercado_pago_client->createPreference([
+                "items" => array(
+                    array(
+                    "title" => $available_plan->name,
+                    "quantity" => 1,
+                    "unit_price" => floatval($available_plan->price),
+                    "currency_id" => "USD"
+                    )
+                    ),
+                ]);
+
+            return response()->json([
+                'payment_link' => $preference->init_point
+            ], 200);
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
