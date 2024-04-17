@@ -6,6 +6,7 @@ use App\Models\Lead;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class ChatControllerTest
@@ -38,7 +39,7 @@ class ChatControllerTest extends TestApi
             'country_code'      => '+57',
             'phone_number'      => '3133920001',
             'full_phone_number' => '+573133920001',
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ]);
 
         $user2 = User::create([
@@ -48,7 +49,7 @@ class ChatControllerTest extends TestApi
             'country_code'      => '+57',
             'phone_number'      => '3133920001',
             'full_phone_number' => '+573133920002',
-            'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+            'password'          => Hash::make('qwerty123')
         ]);
 
         $lead1 = Lead::create([

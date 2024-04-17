@@ -43,6 +43,7 @@ Route::prefix('/profile')->group(function() {
 
 Route::prefix('/plan')->group(function() {
     Route::get('/purchase', 'App\Http\Controllers\api\v1\PlanController@getLeadPlans')->middleware(['auth:sanctum', 'abilities:plan:purchase']);
+    Route::get('/purchase/{plan_id}', 'App\Http\Controllers\api\v1\PlanController@getPreferenceId')->middleware(['auth:sanctum', 'abilities:plan:purchase']);
     Route::post('', 'App\Http\Controllers\api\v1\PlanController@store')->middleware(['auth:sanctum', 'abilities:plan:store']);
     Route::patch('/{plan_id}', 'App\Http\Controllers\api\v1\PlanController@update')->middleware(['auth:sanctum', 'abilities:plan:update']);
 });

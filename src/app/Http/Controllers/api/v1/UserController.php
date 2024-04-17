@@ -11,6 +11,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -99,7 +100,7 @@ class UserController extends Controller
                 'country_code'      => $request->country_code,
                 'phone_number'      => $request->phone_number,
                 'full_phone_number' => $request->full_phone_number,
-                'password'          => '$2y$10$dmQmyyu./5uEb.Ti/ZeO3e80V8.mbivA4K1b43O9yvjWbvff0J7qK'
+                'password'          => Hash::make('qwerty123')
             ]);
 
             event(new UserStored($user));
