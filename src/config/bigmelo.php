@@ -15,4 +15,7 @@ return [
         'validation_code_message'   => env('VALIDATION_CODE_MESSAGE', 'Tu código de validación de Bigmelo es: '),
         'not_registered_user_message_limit'                     => env('NOT_REGISTERED_USER_MESSAGE_LIMIT', 5),
     ],
+    'client' => [
+        'url' => env('CLIENT_URL'),
+    ],
 ];

@@ -34,6 +34,13 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         /*
+         * Plan events
+         */
+        'App\Events\Plan\PlanActivated' => [
+            'App\Listeners\Plan\ActivatePlan',
+        ],
+
+        /*
          * Project events
          */
         'App\Events\Project\ProjectContentStored' => [

@@ -33,7 +33,8 @@ class Lead extends Model
         'birthdate',
         'active',
         'plan_id',
-        'remaining_messages'
+        'remaining_messages',
+        'plan_start_at'
     ];
 
     /**

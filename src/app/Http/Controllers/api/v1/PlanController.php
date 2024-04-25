@@ -3,14 +3,22 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Classes\MercadoPago\MercadoPagoClient;
+use App\Events\Plan\PlanActivated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Plan\PlanPaymentRequest;
 use App\Http\Requests\Project\StorePlanRequest;
 use App\Http\Requests\Project\UpdatePlanRequest;
 use App\Http\Resources\Plan\PlanCollection;
+use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\Project;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use MercadoPago\Resources\Invoice\Payment as InvoicePayment;
+use MercadoPago\Resources\MerchantOrder\Payment as MerchantOrderPayment;
+use MercadoPago\Resources\Payment as ResourcesPayment;
 
 class PlanController extends Controller
 {
@@ -98,7 +106,7 @@ class PlanController extends Controller
     *                 type="object",
     *                 @OA\Property(property="id", type="integer"),
     *                 @OA\Property(property="project_id", type="integer"),
-    *                 @OA&lt;3>Property(property="name", type="string"),
+    *                 @OA\Property(property="name", type="string"),
     *                 @OA\Property(property="description", type="string"),
     *                 @OA\Property(property="price", type="number"),
     *                 @OA\Property(property="message_limit", type="integer"),
@@ -130,10 +138,49 @@ class PlanController extends Controller
         }
     }
 
+    /**
+     * Get a preference ID for purchasing a specific plan.
+     *
+     * @OA\Post(
+     *     path="/v1/plan/purchase/{plan_id}",
+     *     operationId="getPreferenceId",
+     *     tags={"Plan"},
+     *     summary="Get a preference ID for purchasing a plan",
+     *     @OA\Parameter(
+     *         name="plan_id",
+     *         in="path",
+     *         required=true,
+     *         description="The ID of the plan to purchase",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="payment_link", type="string", description="URL to initiate the payment")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Plan not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", description="Error message")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
     public function getPreferenceId(Request $request , int $plan_id): JsonResponse
     {
         try {
-            $project = $request->user()->lead->projects->first();
+            $user = $request->user();
+            $project = $user->lead->projects->first();
             $available_plan = $project->plans->find($plan_id);
             
             if(!$available_plan) {
@@ -141,24 +188,122 @@ class PlanController extends Controller
                     'message' => 'This plan does not exist'
                 ], 404);
             }
-            
+
+            $transaction = Transaction::create([
+                'lead_id'       => $user->lead->id,
+                'plan_id'       => $available_plan->id,
+                'amount'        => $available_plan->price
+            ]);
+
             $mercado_pago_client = new MercadoPagoClient();
             $preference = $mercado_pago_client->createPreference([
-                "items" => array(
-                    array(
+                "items" => [
+                    [
                     "title" => $available_plan->name,
                     "quantity" => 1,
                     "unit_price" => floatval($available_plan->price),
                     "currency_id" => "USD"
-                    )
-                    ),
+                    ]
+                ],
+                "back_urls" => [
+                    "success" => config('bigmelo.client.url') . '/payment-success',
+                    "failure" => config('bigmelo.client.url') . '/payment-failed',
+                ],
+                "auto_return" => "approved",
+                "external_reference" => $transaction->id,
                 ]);
+
+            $transaction->preference_id = $preference->id;
+            $transaction->save();
 
             return response()->json([
                 'payment_link' => $preference->init_point
             ], 200);
 
         } catch (\Throwable $e) {
+            Log::error(
+                'PlanController - getPreferenceId, ' .
+                'Error: ' . $e->getMessage() . ',' .
+                'Plan_id: ' . $plan_id
+            );
+
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+    * Register the payment of a plan.
+    *
+    * @OA\Post(
+    *     path="/v1/plan/payment",
+    *     operationId="planPayment",
+    *     tags={"Plan"},
+    *     summary="Register the payment of a plan",
+    *     @OA\RequestBody(
+    *         required=true,
+    *         description="Payment information",
+    *         @OA\JsonContent(
+    *             required={"preference_id", "payment_id", "status"},
+    *             @OA\Property(property="preference_id", type="string", description="The preference ID received when calling getPreferenceId"),
+    *             @OA\Property(property="payment_id", type="string", description="The payment ID returned by Mercado Pago"),
+    *             @OA\Property(property="status", type="string", description="The payment status. Can be 'approved', 'pending', 'rejected', 'cancelled', 'refunded', or 'in_process'")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Transaction registered successfully",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="message", type="string", description="Success message")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=404,
+    *         description="Transaction not found",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="message", type="string", description="Error message")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=500,
+    *         description="Internal server error",
+    *          @OA\JsonContent(
+    *             @OA\Property(property="message", type="string")
+    *         )
+    *     )
+    * )
+    */
+    public function planPayment(PlanPaymentRequest $request): JsonResponse
+    {
+        try {
+            $transaction = Transaction::where('preference_id', $request->preference_id)->first();
+
+            if(!$transaction){
+                return response()->json([
+                    'message' => 'This transaction does not exist'
+                ], 404);
+            }
+
+            $payment = Payment::where('payment_id', $request->payment_id)->first();
+            $transaction->payment_id = $request->payment_id;
+            $transaction->status = $payment ? 'completed' : $request->status;
+            $transaction->save();
+
+            if($payment){
+                event(new PlanActivated($transaction->id));
+            }
+            
+            return response()->json([
+                'message' => 'Transacition registered successfully',
+            ], 200);
+
+        } catch (\Throwable $e) {
+            Log::error(
+                'PlanController - planPayment, ' .
+                'Error: ' . $e->getMessage() . ',' .
+                'Request: ' . json_encode($request->input())
+
+            );
+            
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }

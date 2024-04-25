@@ -20,3 +20,4 @@
 /src/.vscode
 /.idea
 /postgres-data/*
+/src/package-lock.json
