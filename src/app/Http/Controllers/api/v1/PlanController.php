@@ -221,6 +221,12 @@ class PlanController extends Controller
             ], 200);
 
         } catch (\Throwable $e) {
+            Log::error(
+                'PlanController - getPreferenceId, ' .
+                'Error: ' . $e->getMessage() . ',' .
+                'Plan_id: ' . $plan_id
+            );
+
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -291,6 +297,13 @@ class PlanController extends Controller
             ], 200);
 
         } catch (\Throwable $e) {
+            Log::error(
+                'PlanController - planPayment, ' .
+                'Error: ' . $e->getMessage() . ',' .
+                'Request: ' . json_encode($request->input())
+
+            );
+            
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
