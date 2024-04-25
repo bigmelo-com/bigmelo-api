@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('lead_id');
             $table->unsignedBigInteger('plan_id');
-            $table->string('preference_id');
+            $table->string('preference_id')->nullable();
             $table->unsignedBigInteger('payment_id')->nullable();
             $table->enum('status', ['pending', 'approved', 'completed'])->default('pending');
             $table->string('amount');

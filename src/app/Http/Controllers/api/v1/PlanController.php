@@ -189,6 +189,12 @@ class PlanController extends Controller
                 ], 404);
             }
 
+            $transaction = Transaction::create([
+                'lead_id'       => $user->lead->id,
+                'plan_id'       => $available_plan->id,
+                'amount'        => $available_plan->price
+            ]);
+
             $mercado_pago_client = new MercadoPagoClient();
             $preference = $mercado_pago_client->createPreference([
                 "items" => [
@@ -204,15 +210,11 @@ class PlanController extends Controller
                     "failure" => config('bigmelo.client.url') . '/payment-failed',
                 ],
                 "auto_return" => "approved",
-                "notification_url" => "https://1241-161-10-162-181.ngrok-free.app/v1/plan/payment-webhook"
+                "external_reference" => $transaction->id,
                 ]);
 
-                Transaction::create([
-                    'lead_id'       => $user->lead->id,
-                    'plan_id'       => $available_plan->id,
-                    'preference_id' => $preference->id,
-                    'amount'        => $available_plan->price
-                ]);
+            $transaction->preference_id = $preference->id;
+            $transaction->save();
 
             return response()->json([
                 'payment_link' => $preference->init_point
