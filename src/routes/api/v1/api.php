@@ -47,6 +47,7 @@ Route::prefix('/plan')->group(function() {
     Route::post('', 'App\Http\Controllers\api\v1\PlanController@store')->middleware(['auth:sanctum', 'abilities:plan:store']);
     Route::post('/payment', 'App\Http\Controllers\api\v1\PlanController@planPayment')->middleware(['auth:sanctum', 'abilities:plan:payment']);
     Route::patch('/{plan_id}', 'App\Http\Controllers\api\v1\PlanController@update')->middleware(['auth:sanctum', 'abilities:plan:update']);
+    Route::post('/payment-webhook', 'App\Http\Controllers\api\v1\PlanController@paymentWebhook');
 });
 
 Route::prefix('/project')->group(function() {

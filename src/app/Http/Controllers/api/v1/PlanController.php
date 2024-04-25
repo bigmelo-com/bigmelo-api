@@ -309,6 +309,62 @@ class PlanController extends Controller
     }
 
     /**
+     * Webhook to receive payment notifications from Mercado Pago.
+     *
+     * @OA\Post(
+     *     path="/v1/plan/payment-webhook",
+     *     operationId="paymentWebhook",
+     *     tags={"Plan"},
+     *     summary="Webhook to receive payment notifications",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Payment data from Mercado Pago",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="object", description="Payment information"),
+     *             @OA\Property(property="id", type="string", description="The Mercado Pago payment ID")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Request received successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", description="Success message")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *          @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", description="Error message")
+     *         )
+     *     )
+     * )
+     */
+    public function paymentWebhook(Request $request): JsonResponse
+    {
+        try {
+            $payment = Payment::create([
+                'payment_id' => $request->data["id"]
+            ]);
+            $transaction = Transaction::where('payment_id', $payment->payment_id)->first();
+            
+            if($transaction){
+                $transaction->status = $transaction ? 'completed' : $transaction->status;
+                $transaction->save();
+                event(new PlanActivated($transaction->id));
+            };
+
+            return response()->json([
+                'message' => 'Request recived successfully',
+            ], 200);
+
+        } catch (\Throwable $e) {
+            Log::debug($e);
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Store a new plan.
      * 
      * @OA\Post(
