@@ -30,6 +30,7 @@ return [
             'plan:get',
             'plan:update',
             'plan:purchase',
+            'plan:payment',
         ]
     ],
     'user' => [
@@ -41,6 +42,7 @@ return [
             'profile:get',
             'plan:get',
             'plan:purchase',
+            'plan:payment',
         ]
     ],
     'inactive' => [
