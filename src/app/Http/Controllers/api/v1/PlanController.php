@@ -16,9 +16,6 @@ use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use MercadoPago\Resources\Invoice\Payment as InvoicePayment;
-use MercadoPago\Resources\MerchantOrder\Payment as MerchantOrderPayment;
-use MercadoPago\Resources\Payment as ResourcesPayment;
 
 class PlanController extends Controller
 {
