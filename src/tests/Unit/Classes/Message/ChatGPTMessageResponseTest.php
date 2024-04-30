@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  * Run these specific tests
  * php artisan test tests/Unit/Classes/Message/ChatGPTMessageResponseTest.php
  *
- * @package Tests\Unit\Classes\MercadoPago
+ * @package Tests\Unit\Classes\Message
  */
 class ChatGPTMessageResponseTest extends TestCase
 {
