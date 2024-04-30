@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\api\v1;
 
 use App\Events\User\UserValidated;
 use App\Models\Plan;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -341,4 +342,80 @@ class PlanControllerTest extends TestApi
         
         $response->assertStatus(200);
     }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_can_register_a_transaction_successfully(): void
+    {
+        User::create([
+            'role'              => 'user',
+            'name'              => 'User',
+            'last_name'         => 'Test',
+            'email'             => 'user@test.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test'),
+            'active'            => true,
+            'validation_code'   => null
+        ]);
+        
+        Transaction::create([
+            'preference_id' => 'test',
+            'lead_id'       => 1,
+            'plan_id'       => 1,
+            'amount'        => '5.70'
+        ]);
+
+        $transaction_data = [
+            'preference_id' => 'test',
+            'payment_id'    => 12345,
+            'status'        => 'approved'
+        ];
+
+        $response = $this->withHeader(
+            'Authorization', 'Bearer ' . $this->getToken('user@test.com','test')
+        )->json('POST', self::ENDPOINT_PLAN . '/payment', $transaction_data);
+        
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'Transacition registered successfully');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_can_not_register_a_transaction(): void
+    {
+        User::create([
+            'role'              => 'user',
+            'name'              => 'User',
+            'last_name'         => 'Test',
+            'email'             => 'user@test.com',
+            'country_code'      => '+57',
+            'phone_number'      => '3133777777',
+            'full_phone_number' => '+573133777777',
+            'password'          => Hash::make('test'),
+            'active'            => true,
+            'validation_code'   => null
+        ]);
+
+        $transaction_data = [
+            'preference_id' => 'test',
+            'payment_id'    => 12345,
+            'status'        => 'approved'
+        ];
+
+        $response = $this->withHeader(
+            'Authorization', 'Bearer ' . $this->getToken('user@test.com','test')
+        )->json('POST', self::ENDPOINT_PLAN . '/payment', $transaction_data);
+        
+        $response->assertStatus(404);
+        $response->assertJsonPath('message', 'This transaction does not exist');
+    }
+
 }
