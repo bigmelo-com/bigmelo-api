@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('bigmelo:assign-free-messages')->monthlyOn(1, '14:00');
     }
 
     /**
