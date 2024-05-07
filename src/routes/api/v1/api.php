@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/test', 'App\Http\Controllers\api\v1\TestController@index')->middleware(['auth:sanctum', 'abilities:test:test']);
+Route::get('health', function() {
+    return response()->json(['message' => 'ok']);
+});
 
 Route::prefix('/auth')->group(function() {
     Route::post('/get-token', 'App\Http\Controllers\api\v1\AuthController@getToken');
