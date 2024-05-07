@@ -39,7 +39,7 @@ class AssignFreeMessages extends Command
                 $message = $message_repository->storeMessage(
                     lead_id: $lead->id,
                     project_id: 1,
-                    content: "Hola $lead->first_name, tienes mensajes 5 gratis para que converses con la inteligencia artificial de Bigmelo. ¿Qué te gustaria preguntar?",
+                    content: "Hola $lead->first_name, tienes 5 mensajes gratis para que converses con la inteligencia artificial de Bigmelo. ¿Qué te gustaria preguntar?",
                     source: 'Admin'
                 );
 
