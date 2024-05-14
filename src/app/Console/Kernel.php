@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('bigmelo:assign-free-messages')->monthlyOn(1, '14:00');
         $schedule->command('bigmelo:verify-payments')->dailyAt('14:00');
-        $schedule->command('app:update-messages-for-old-leads')->dailyAt('14:00');
+        $schedule->command('bigmelo:update-messages-for-old-leads')->dailyAt('14:00');
+        $schedule->command('bigmelo:test')->hourly();
     }
 
     /**
