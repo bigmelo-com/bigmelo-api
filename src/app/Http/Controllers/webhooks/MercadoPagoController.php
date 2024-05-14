@@ -30,13 +30,11 @@ class MercadoPagoController extends Controller
             $transaction = Transaction::where('payment_id', $payment->payment_id)->first();
             
             if($transaction){
-                $transaction->status = $transaction ? 'completed' : $transaction->status;
-                $transaction->save();
-                event(new PlanActivated($transaction->id));
+                event(new PlanActivated($transaction));
             };
 
             return response()->json([
-                'message' => 'Request recived successfully',
+                'message' => 'Request recived successfully'
             ], 200);
 
         } catch (\Throwable $e) {

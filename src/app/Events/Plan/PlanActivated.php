@@ -3,7 +3,6 @@
 namespace App\Events\Plan;
 
 use App\Models\Lead;
-use App\Models\Plan;
 use App\Models\Transaction;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -15,12 +14,12 @@ class PlanActivated
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * Lead with new plan.
+     * Transaction made.
      *
-     * @var Lead
+     * @var Transaction
      */
     public Transaction $transaction;
-
+    
     /**
      * User activate their plan.
      */

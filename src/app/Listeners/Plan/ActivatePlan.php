@@ -21,12 +21,15 @@ class ActivatePlan
     {
         $transaction = $event->transaction;
         try {
-            $lead = Lead::find($transaction->lead_id);
             $plan = Plan::find($transaction->plan_id);
+            $lead = Lead::find($transaction->lead_id);
             $lead->plan_id = $plan->id;
             $lead->remaining_messages = $plan->message_limit;
             $lead->plan_start_at = Carbon::now();
             $lead->save();
+
+            $transaction->status = 'completed';
+            $transaction->save();
 
             DB::table('lead_plan_logs')->insert([
                 'lead_id'           => $lead->id,
