@@ -281,6 +281,7 @@ class PlanController extends Controller
             }
 
             $payment = Payment::where('payment_id', $request->payment_id)->first();
+            $transaction->status = $request->status;
             $transaction->payment_id = $request->payment_id;
             $transaction->save();
 
