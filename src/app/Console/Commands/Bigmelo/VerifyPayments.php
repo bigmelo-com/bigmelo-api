@@ -32,7 +32,7 @@ class VerifyPayments extends Command
     public function handle()
     {
         try {
-            Payment::all()->each(function ($payment) {
+            Payment::all()->each(function (Payment $payment) {
                 $client = new MercadoPagoClient();
                 $mp_payment = $client->getPaymentFromMercadoPago($payment->payment_id);
                 $transaction = Transaction::find($mp_payment->external_reference);
