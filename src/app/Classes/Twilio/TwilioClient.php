@@ -57,4 +57,35 @@ class TwilioClient
             );
         }
     }
+
+    /**
+     * Send a message template to Whatsapp
+     *
+     * @param string $phone_number
+     * @param string $template_sid
+     * @param array $variables
+     *
+     * @return void
+     *
+     * @throws TwilioClientCouldNotSendAMessageToWhatsappException
+     */
+    public function sendMessageTemplateToWhatsapp(string $phone_number, string $template_sid, array $variables = []): void
+    {
+        try {
+            $this->client->messages->create(
+                "whatsapp:$phone_number",
+                [
+                    'from' => "whatsapp:$this->twilio_phone_number",
+                    'contentSid' => $template_sid,
+                    "contentVariables" => json_encode($variables)
+                ]
+            );
+
+        } catch (\Throwable $e) {
+            throw new TwilioClientCouldNotSendAMessageToWhatsappException(
+                'Error Twilio Client, ' .
+                'error: ' . $e->getMessage()
+            );
+        }
+    }
 }

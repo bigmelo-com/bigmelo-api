@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('bigmelo:assign-free-messages')->monthlyOn(1, '14:00');
+        $schedule->command('bigmelo:verify-payments')->dailyAt('14:00');
     }
 
     /**

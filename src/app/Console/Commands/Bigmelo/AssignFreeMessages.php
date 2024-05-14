@@ -53,7 +53,7 @@ class AssignFreeMessages extends Command
                 'Assigned 5 messages to free accounts with zero messages, ' .
                 'default_project_id: ' . $default_project . ', '
             );
-
+            
         } catch (\Throwable $e) {
             Log::error(
                 'AssignFreeMessages: Internal error, ' .

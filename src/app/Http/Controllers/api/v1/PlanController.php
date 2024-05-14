@@ -281,12 +281,12 @@ class PlanController extends Controller
             }
 
             $payment = Payment::where('payment_id', $request->payment_id)->first();
+            $transaction->status = $request->status;
             $transaction->payment_id = $request->payment_id;
-            $transaction->status = $payment ? 'completed' : $request->status;
             $transaction->save();
 
             if($payment){
-                event(new PlanActivated($transaction->id));
+                event(new PlanActivated($transaction));
             }
             
             return response()->json([

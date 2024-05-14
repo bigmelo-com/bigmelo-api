@@ -4,8 +4,10 @@ namespace App\Classes\MercadoPago;
 
 use App\Exceptions\MercadoPago\MercadoPagoCouldNotCreatePreference;
 use App\Exceptions\MercadoPago\MercadoPagoCouldNotGetPaymentInfo;
+use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Resources\Payment;
 use MercadoPago\Resources\Preference;
 
 class MercadoPagoClient
@@ -55,11 +57,12 @@ class MercadoPagoClient
      *
      * @throws MercadoPagoCouldNotCreatePreference
      */
-    public function getPaymentFromMercadoPago($payment_id): Preference
+    public function getPaymentFromMercadoPago($payment_id): Payment
     {
         try {
-            return $this->client->get($payment_id);
+            $payment_client = new PaymentClient();
 
+            return $payment_client->get($payment_id);
         } catch (\Throwable $e) {
             throw new MercadoPagoCouldNotGetPaymentInfo(
                 'Error Mercado Pago Client, ' .
