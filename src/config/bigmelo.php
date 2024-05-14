@@ -14,6 +14,7 @@ return [
         'wrong_media_type'                          => 'El archivo adjunto no se puede procesar',
         'validation_code_message'                   => env('VALIDATION_CODE_MESSAGE', 'Tu código de validación de Bigmelo es: '),
         'not_registered_user_message_limit'         => env('NOT_REGISTERED_USER_MESSAGE_LIMIT', 5),
+        'registered_user_message_limit'             => env('REGISTERED_USER_FREE_MESSAGES', 3),
     ],
     'client' => [
         'url' => env('CLIENT_URL'),
