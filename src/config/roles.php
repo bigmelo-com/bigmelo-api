@@ -31,6 +31,7 @@ return [
             'plan:update',
             'plan:purchase',
             'plan:payment',
+            'mail:send',
         ]
     ],
     'user' => [
@@ -43,6 +44,7 @@ return [
             'plan:get',
             'plan:purchase',
             'plan:payment',
+            'mail:send',
         ]
     ],
     'inactive' => [
