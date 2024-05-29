@@ -69,3 +69,7 @@ Route::prefix('/organization')->group(function() {
     Route::patch('/{organization_id}', 'App\Http\Controllers\api\v1\OrganizationController@update')->middleware(['auth:sanctum', 'abilities:organization:store']);
     Route::get('/{organization_id}/projects', 'App\Http\Controllers\api\v1\ProjectController@index')->middleware(['auth:sanctum', 'abilities:project:list']);
 });
+
+Route::prefix('/contact')->group(function() {
+    Route::post('', 'App\Http\Controllers\api\v1\MailController@sendSupportEmail')->middleware(['auth:sanctum', 'abilities:mail:send']);
+});

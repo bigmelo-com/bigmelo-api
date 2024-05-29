@@ -19,4 +19,9 @@ return [
     'client' => [
         'url' => env('CLIENT_URL'),
     ],
+    'mail' => [
+        'from_address'              => env('MAIL_FROM_ADDRESS'),
+        'from_name'                 => env('MAIL_FROM_NAME'),
+        'notification_addresses'    => env('NOTIFICATION_EMAIL_ADDRESSES'),
+    ],
 ];
