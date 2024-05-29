@@ -47,6 +47,10 @@ class StoreMessageFromWhatsapp
 
             $message_text = $content['Body'];
 
+            if ($this->isMessageInAudio($content)) {
+                $message_text = $this->getMessageFromAudio($whatsapp_data['media_url'], $whatsapp_data['media_content_type']);
+            }
+
             $project = Project::where(
                 'phone_number',
                 str_replace('whatsapp:', '', $whatsapp_data['to'])
@@ -93,4 +97,46 @@ class StoreMessageFromWhatsapp
             );
         }
     }
+
+    /**
+     * Check if the content has the message as audio
+     *
+     * @param array $content
+     *
+     * @return bool
+     */
+    private function isMessageInAudio(array $content): bool
+    {
+        if (!empty($content['Body'])) {
+            return false;
+        }
+
+        $content_type = $content['MediaContentType0'] ?? '';
+
+        if (strpos($content_type, 'audio/') === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get text from an audio file
+     *
+     * @param string $audio_url
+     * @param string $content_type
+     *
+     * @return string
+     */
+    private function getMessageFromAudio(string $audio_url, string $content_type): string
+    {
+        $audio_content = file_get_contents($audio_url);
+
+        $filename = 'audio_' . time() . '.' . explode('/', $content_type)[1];
+
+        Storage::disk('public')->put($filename, $audio_content);
+
+        return 'ok';
+    }
+
 }
