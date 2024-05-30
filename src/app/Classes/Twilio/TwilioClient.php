@@ -2,7 +2,9 @@
 
 namespace App\Classes\Twilio;
 
+use App\Exceptions\Twilio\TwilioClientCouldNotGetFileContentException;
 use App\Exceptions\Twilio\TwilioClientCouldNotSendAMessageToWhatsappException;
+use Illuminate\Support\Facades\Http;
 use Twilio\Rest\Client;
 
 class TwilioClient
@@ -15,16 +17,29 @@ class TwilioClient
     /**
      * @var string
      */
+    private string $sid;
+
+    /**
+     * @var string
+     */
+    private string $token;
+
+    /**
+     * @var string
+     */
     private string $twilio_phone_number;
 
     /**
+     *
+     * @param string $twilio_phone_number
+     *
      * @throws \Twilio\Exceptions\ConfigurationException
      */
     public function __construct(string $twilio_phone_number)
     {
-        $sid = config('bigmelo.twilio.sid');
-        $token = config('bigmelo.twilio.token');
-        $this->client = new Client($sid, $token);
+        $this->sid = config('bigmelo.twilio.sid');
+        $this->token = config('bigmelo.twilio.token');
+        $this->client = new Client($this->sid, $this->token);
 
         $this->twilio_phone_number = $twilio_phone_number;
     }
@@ -84,6 +99,31 @@ class TwilioClient
         } catch (\Throwable $e) {
             throw new TwilioClientCouldNotSendAMessageToWhatsappException(
                 'Error Twilio Client, ' .
+                'error: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Get the content from a file in twilio
+     *
+     * Used mostly when an audio file is sent using Whatsapp.
+     *
+     * @param string $file_url
+     * @return string
+     *
+     * @throws TwilioClientCouldNotGetFileContentException
+     */
+    public function getFileContent(string $file_url): string
+    {
+        try {
+            $response = Http::withBasicAuth($this->sid, $this->token)->get($file_url);
+
+            return $response->body();
+
+        } catch (\Throwable $e) {
+            throw new TwilioClientCouldNotGetFileContentException(
+                'Error Twilio Client Getting File Content, ' .
                 'error: ' . $e->getMessage()
             );
         }

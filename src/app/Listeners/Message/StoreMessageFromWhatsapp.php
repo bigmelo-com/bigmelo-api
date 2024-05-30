@@ -2,6 +2,7 @@
 
 namespace App\Listeners\Message;
 
+use App\Classes\Twilio\TwilioClient;
 use App\Events\Message\UserMessageStored;
 use App\Events\Webhook\WhatsappMessageReceived;
 use App\Models\Lead;
@@ -47,14 +48,14 @@ class StoreMessageFromWhatsapp
 
             $message_text = $content['Body'];
 
-            if ($this->isMessageInAudio($content)) {
-                $message_text = $this->getMessageFromAudio($whatsapp_data['media_url'], $whatsapp_data['media_content_type']);
-            }
-
             $project = Project::where(
                 'phone_number',
                 str_replace('whatsapp:', '', $whatsapp_data['to'])
             )->first();
+
+            if ($this->isMessageInAudio($content)) {
+                $message_text = $this->getMessageFromAudio($whatsapp_data['media_url'], $whatsapp_data['media_content_type'], $project);
+            }
 
             $from_number = str_replace('whatsapp:', '', $content['From']);
 
@@ -128,15 +129,17 @@ class StoreMessageFromWhatsapp
      *
      * @return string
      */
-    private function getMessageFromAudio(string $audio_url, string $content_type): string
+    private function getMessageFromAudio(string $audio_url, string $content_type, Project $project): string
     {
-        $audio_content = file_get_contents($audio_url);
+        $twilio_client = new TwilioClient($project->phone_number);
+
+        $audio_content = $twilio_client->getFileContent($audio_url);
 
         $filename = 'audio_' . time() . '.' . explode('/', $content_type)[1];
 
         Storage::disk('public')->put($filename, $audio_content);
 
-        return 'ok';
+        return $filename;
     }
 
 }
