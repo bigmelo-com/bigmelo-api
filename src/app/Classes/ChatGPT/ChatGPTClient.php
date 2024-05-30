@@ -4,6 +4,7 @@ namespace App\Classes\ChatGPT;
 
 use App\Classes\Message\ChatGPTMessageResponse;
 use App\Exceptions\ChatGPT\ChatGPTClientCouldNotGetANewMessageException;
+use App\Exceptions\ChatGPT\ChatGPTClientCouldNotTranscribeMessageException;
 
 class ChatGPTClient
 {
@@ -105,6 +106,39 @@ class ChatGPTClient
         } catch (\Throwable $e) {
             throw new ChatGPTClientCouldNotGetANewMessageException(
                 'Error ChatGPT Client: Getting embedding, ' .
+                'error: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Get message text from audio file
+     *
+     * @param string $file_path
+     * @return mixed
+     *
+     * @throws ChatGPTClientCouldNotTranscribeMessageException
+     */
+    public function getTextFromAudioFile(string $file_path)
+    {
+        try {
+            $response = $this->client->audio()->transcribe([
+                'model' => 'whisper-1',
+                'file' => fopen($file_path, 'r')
+            ]);
+
+            if (!empty($response['text'])) {
+                return $response['text'];
+            }
+
+            throw new ChatGPTClientCouldNotTranscribeMessageException(
+                'Error ChatGPT Client: Transcribing message, ' .
+                'error: No message found.'
+            );
+
+        } catch (\Throwable $e) {
+            throw new ChatGPTClientCouldNotTranscribeMessageException(
+                'Error ChatGPT Client: Transcribing message, ' .
                 'error: ' . $e->getMessage()
             );
         }

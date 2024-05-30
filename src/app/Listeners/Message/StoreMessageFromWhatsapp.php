@@ -2,6 +2,7 @@
 
 namespace App\Listeners\Message;
 
+use App\Classes\ChatGPT\ChatGPTClient;
 use App\Classes\Twilio\TwilioClient;
 use App\Events\Message\UserMessageStored;
 use App\Events\Webhook\WhatsappMessageReceived;
@@ -127,20 +128,31 @@ class StoreMessageFromWhatsapp
      *
      * @param string $audio_url
      * @param string $content_type
+     * @param Project $project
      *
      * @return string
      */
     private function getMessageFromAudio(string $audio_url, string $content_type, Project $project): string
     {
-        $twilio_client = new TwilioClient($project->phone_number);
+        try {
+            $twilio_client = new TwilioClient($project->phone_number);
 
-        $audio_content = $twilio_client->getFileContent($audio_url);
+            $audio_content = $twilio_client->getFileContent($audio_url);
 
-        $filename = 'audio_' . time() . '.' . explode('/', $content_type)[1];
+            $filename = 'audio_' . time() . '.' . explode('/', $content_type)[1];
 
-        Storage::disk('public')->put($filename, $audio_content);
+            Storage::disk('public')->put($filename, $audio_content);
 
-        return $filename;
+            $chatgpt_client = new ChatGPTClient();
+            $text = $chatgpt_client->getTextFromAudioFile(storage_path('app/public/' . $filename));
+
+            return $text;
+
+        } catch (\Throwable $e) {
+            Log::error('GetMessageFromAudio, error: ' . $e->getMessage());
+
+            return '';
+        }
     }
 
 }

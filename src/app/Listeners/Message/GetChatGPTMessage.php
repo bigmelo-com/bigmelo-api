@@ -2,7 +2,6 @@
 
 namespace App\Listeners\Message;
 
-use App\Classes\ChatGPT\ChatGPTChatHistoryParser;
 use App\Classes\ChatGPT\ChatGPTChatPromptBuilder;
 use App\Classes\ChatGPT\ChatGPTClient;
 use App\Classes\Message\ChatGPTMessage;
@@ -88,7 +87,7 @@ class GetChatGPTMessage implements ShouldQueue
                     "issue:" . $issue . ', ' .
                     "message_id: " . $message->id
                 );
-                
+
                return;
             }
 
