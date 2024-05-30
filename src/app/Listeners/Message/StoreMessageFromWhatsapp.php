@@ -146,6 +146,8 @@ class StoreMessageFromWhatsapp
             $chatgpt_client = new ChatGPTClient();
             $text = $chatgpt_client->getTextFromAudioFile(storage_path('app/public/' . $filename));
 
+            Storage::disk('public')->delete($filename);
+
             return $text;
 
         } catch (\Throwable $e) {
