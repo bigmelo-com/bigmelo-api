@@ -2,8 +2,10 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "add-env": "cp -n .env.example .env || true",
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "postinstall": "npm run add-env"
     },
     "devDependencies": {
         "axios": "^1.1.2",
