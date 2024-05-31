@@ -43,7 +43,11 @@ class GetChatGPTMessage implements ShouldQueue
 
         try {
 
-            if ($lead_message->source == 'WhatsApp' && $lead_message->whatsapp_message->media_content_type != null) {
+            if (
+                $lead_message->source == 'WhatsApp' &&
+                empty($lead_message->content) &&
+                $lead_message->whatsapp_message->media_content_type != null
+            ) {
                 $message = $message_repository->storeMessage(
                     lead_id: $lead_message->lead_id,
                     project_id: $lead_message->project_id,
