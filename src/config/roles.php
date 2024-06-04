@@ -36,6 +36,7 @@ return [
     ],
     'user' => [
         'abilities' => [
+            'test:test',
             'message:store',
             'project:store',
             'project:list',
@@ -49,6 +50,7 @@ return [
     ],
     'inactive' => [
         'abilities' => [
+            'test:test',
             'code:validate',
             'code:get-validation-code'
         ]

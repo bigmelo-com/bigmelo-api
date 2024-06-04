@@ -11,7 +11,7 @@ class TestController extends Controller
     public function index(): JsonResponse
     {
         try {
-            return response()->json(['message' => 'Test ran successfully'], 200);
+            return response()->json(['test_ran' => true], 200);
 
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
