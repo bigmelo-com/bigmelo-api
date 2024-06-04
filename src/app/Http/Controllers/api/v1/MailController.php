@@ -11,6 +11,65 @@ use Illuminate\Support\Facades\Mail;
 
 class MailController extends Controller
 {
+    /**
+     * Send a support email
+     *
+     * @param SupportMailRequest $request
+     *
+     * @return JsonResponse
+     *
+     * @OA\Post(
+     *     path="/v1/contact",
+     *     operationId="sendSupportEmail",
+     *     description="Send an email to support.",
+     *     tags={"Support"},
+     *     security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 required={"name", "message", "form_email"},
+     *                 @OA\Property(
+     *                     property="name",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="message",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="form_email",
+     *                     type="string",
+     *                     description="Optional email address to include in the notification."
+     *                 ),
+     *                 example={
+     *                     "name": "John Doe",
+     *                     "message": "This is a support message.",
+     *                     "form_email": "johndoe@example.com"
+     *                  }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Email sent successfully.",
+     *         @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Email sent successfully."),
+     *          )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Wrong Request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent()
+     *     )
+     * )
+    */
     public function sendSupportEmail(SupportMailRequest $request): JsonResponse
     {
         try {
