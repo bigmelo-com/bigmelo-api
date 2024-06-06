@@ -16,9 +16,10 @@ class DailyTotalsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'new_leads'     => $this['total_new_leads'] ?? 0,
-            'new_users'     => $this['total_new_users'] ?? 0,
-            'new_messages'  => $this['total_new_messages'] ?? 0,
+            'new_leads'             => $this['total_new_leads'] ?? 0,
+            'new_users'             => $this['total_new_users'] ?? 0,
+            'new_messages'          => $this['total_new_messages'] ?? 0,
+            'new_whatsapp_messages' => $this['total_new_whatsapp_messages'] ?? 0,
         ];
     }
 }
