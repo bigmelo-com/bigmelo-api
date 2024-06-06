@@ -74,5 +74,5 @@ Route::prefix('/contact')->group(function() {
 });
 
 Route::prefix('/admin-dashboard')->group(function() {
-    Route::get('/daily-totals', 'App\Http\Controllers\api\v1\AdminDashboardController@getDailyTotals');
+    Route::get('/daily-totals', 'App\Http\Controllers\api\v1\AdminDashboardController@getDailyTotals')->middleware(['auth:sanctum', 'abilities:admin:get-dashboard']);
 });

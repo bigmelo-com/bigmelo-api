@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\api\v1;
 
+use App\Events\User\UserValidated;
 use App\Models\Lead;
 use App\Models\Message;
 use App\Models\User;
@@ -260,6 +261,20 @@ class AdminDashboardControllerTest extends TestApi
         $response->assertJsonPath('data.new_users', 0);
         $response->assertJsonPath('data.new_whatsapp_messages', 0);
         $response->assertJsonPath('data.new_messages', 0);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthenticated_user_can_not_get_totals()
+    {
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->faker->word())
+            ->json('GET', self::ENDPOINT_ADMIN_DASHBOARD . '/daily-totals');
+
+        $response->assertStatus(401);
+        $response->assertJsonPath('message', 'Unauthenticated.');
     }
 
 }
