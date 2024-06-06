@@ -72,3 +72,7 @@ Route::prefix('/organization')->group(function() {
 Route::prefix('/contact')->group(function() {
     Route::post('', 'App\Http\Controllers\api\v1\MailController@sendSupportEmail')->middleware(['auth:sanctum', 'abilities:mail:send']);
 });
+
+Route::prefix('/admin-dashboard')->group(function() {
+    Route::get('/daily-totals', 'App\Http\Controllers\api\v1\AdminDashboardController@getDailyTotals');
+});
