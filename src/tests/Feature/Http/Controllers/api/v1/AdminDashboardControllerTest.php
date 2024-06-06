@@ -3,8 +3,10 @@
 namespace Tests\Feature\Http\Controllers\api\v1;
 
 use App\Models\Lead;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /**
@@ -45,5 +47,39 @@ class AdminDashboardControllerTest extends TestApi
             ->json('GET', self::ENDPOINT_ADMIN_DASHBOARD . '/daily-totals');
 
         $response->assertJsonPath('data.new_leads', 3);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function admin_can_get_total_users_created_today(): void
+    {
+        $user1 = User::create([
+            'role'              => 'user',
+            'name'              => $this->faker->name,
+            'email'             => $this->faker->email,
+            'country_code'      => '+57',
+            'phone_number'      => '3133920001',
+            'full_phone_number' => '+573133920001',
+            'password'          => Hash::make($this->faker->password)
+        ]);
+
+        $user2 = User::create([
+            'role'              => 'user',
+            'name'              => $this->faker->name,
+            'email'             => $this->faker->email,
+            'country_code'      => '+57',
+            'phone_number'      => '3133920002',
+            'full_phone_number' => '+573133920002',
+            'password'          => Hash::make($this->faker->password)
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('GET', self::ENDPOINT_ADMIN_DASHBOARD . '/daily-totals');
+
+        $response->assertJsonPath('data.new_leads', 1);
+        $response->assertJsonPath('data.new_users', 3);
     }
 }

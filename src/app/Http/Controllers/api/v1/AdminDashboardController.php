@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminDashboard\DailyTotalsResource;
 use App\Models\Lead;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -17,9 +18,11 @@ class AdminDashboardController extends Controller
             $today = Carbon::today();
 
             $new_leads = Lead::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->get();
+            $new_users = User::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->get();
 
             $result = [
-                'total_new_leads' => $new_leads->count()
+                'total_new_leads' => $new_leads->count(),
+                'total_new_users' => $new_users->count(),
             ];
 
             return (new DailyTotalsResource($result))->response()->setStatusCode(200);
