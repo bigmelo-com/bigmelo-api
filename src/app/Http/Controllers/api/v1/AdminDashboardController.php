@@ -10,13 +10,24 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class AdminDashboardController extends Controller
 {
-    public function getDailyTotals(): JsonResponse
+    public function getDailyTotals(Request $request): JsonResponse
     {
         try {
-            $today = Carbon::today();
+            $validator = Validator::make($request->all(), [
+                'date' => 'nullable|date_format:Y-m-d',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Wrong date format. It have to be YYYY-MM-DD.'
+                ], 400);
+            }
+
+            $today = $request->input('date') ? Carbon::parse($request->input('date')) : Carbon::today();
 
             $new_leads = Lead::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->get();
             $new_users = User::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->get();
