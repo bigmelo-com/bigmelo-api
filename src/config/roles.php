@@ -32,6 +32,7 @@ return [
             'plan:purchase',
             'plan:payment',
             'mail:send',
+            'admin:get-dashboard',
         ]
     ],
     'user' => [
