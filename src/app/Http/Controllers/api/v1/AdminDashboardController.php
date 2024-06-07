@@ -14,6 +14,44 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminDashboardController extends Controller
 {
+    /**
+     * Get the daily totals for admin dashboard
+     *
+     * @OA\Get(
+     *      path="/v1/admin-dashboard/daily-totals?date={date}",
+     *      tags={"Dashboard"},
+     *      security={{"bearerAuth":{}}},
+     *      summary="Get daily totals",
+     *      description="Retrieves the daily totals for new leads, new users, and new messages.",
+     *      operationId="getDailyTotals",
+     *      @OA\Parameter(
+     *          description="Date for the daily report, default date is today.",
+     *          in="path",
+     *          name="date",
+     *          required=false,
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Daily totals retrieved successfully",
+     *          @OA\JsonContent()
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error"
+     *      )
+     *  )
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     public function getDailyTotals(Request $request): JsonResponse
     {
         try {
