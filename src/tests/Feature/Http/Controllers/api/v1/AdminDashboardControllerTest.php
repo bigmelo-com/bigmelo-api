@@ -165,6 +165,7 @@ class AdminDashboardControllerTest extends TestApi
         $response->assertJsonPath('data.new_users', 3);
         $response->assertJsonPath('data.new_whatsapp_messages', 3);
         $response->assertJsonPath('data.new_messages', 5);
+        $response->assertJsonPath('data.daily_chats', 2);
     }
 
     /**
