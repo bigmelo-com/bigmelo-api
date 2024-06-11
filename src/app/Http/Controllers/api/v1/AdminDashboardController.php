@@ -7,6 +7,7 @@ use App\Http\Resources\AdminDashboard\DailyTotalsResource;
 use App\Models\Lead;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\WhatsappMessage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -71,12 +72,16 @@ class AdminDashboardController extends Controller
             $new_users = User::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->get();
             $new_messages = Message::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->get();
             $new_whatsapp_messages = Message::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->where('source', 'WhatsApp')->get();
+            $new_audio_messages = WhatsappMessage::whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->where('media_content_type', 'audio/ogg')->get();
+            $daily_chats = Message::select('lead_id')->whereBetween('created_at', [$today->startOfDay(), $today->copy()->endOfDay()])->distinct()->get();
 
             $result = [
                 'total_new_leads'               => $new_leads->count(),
                 'total_new_users'               => $new_users->count(),
                 'total_new_messages'            => $new_messages->count(),
                 'total_new_whatsapp_messages'   => $new_whatsapp_messages->count(),
+                'total_new_audio_messages'      => $new_audio_messages->count(),
+                'total_daily_chats'             => $daily_chats->count(),
             ];
 
             return (new DailyTotalsResource($result))->response()->setStatusCode(200);

@@ -20,6 +20,8 @@ class DailyTotalsResource extends JsonResource
             'new_users'             => $this['total_new_users'] ?? 0,
             'new_messages'          => $this['total_new_messages'] ?? 0,
             'new_whatsapp_messages' => $this['total_new_whatsapp_messages'] ?? 0,
+            'new_audio_messages'    => $this['total_new_audio_messages'] ?? 0,
+            'daily_chats'           => $this['total_daily_chats'] ?? 0,
         ];
     }
 }
