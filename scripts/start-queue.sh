@@ -11,7 +11,7 @@ composer install
 cd /home/ubuntu/bigmelo-api
 git stash
 git stash drop
-sudo git reset --hard origin/main
+git reset --hard origin/main
 git pull origin --rebase
 cd /home/ubuntu/bigmelo-api/src/
 php artisan migrate --seed

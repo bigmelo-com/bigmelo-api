@@ -54,6 +54,10 @@ return [
             'code:validate',
             'code:get-validation-code'
         ]
+    ],
+    'forgotten' => [
+        'abilities' => [
+            'password:recovery'
+        ]
     ]
-
 ];
