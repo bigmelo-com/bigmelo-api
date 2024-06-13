@@ -57,7 +57,8 @@ class ProfileControllerTest extends TestApi
         $response->assertJsonPath('data.remaining_messages', $remaining_messages == -1 ? 'Ilimitado' : $remaining_messages);
         $response->assertJsonPath('data.message_limit', $message_limit == -1 ? 'Ilimitado' : $message_limit);
         $response->assertJsonPath('data.used_messages', $used_messages);
-        
+        $response->assertJsonPath('data.role', $user->role);
+
     }
 
     /**
@@ -72,7 +73,7 @@ class ProfileControllerTest extends TestApi
             ->json('GET', self::ENDPOINT_PROFILE);
 
         $response->assertStatus(401);
-        
+
     }
 
 }
