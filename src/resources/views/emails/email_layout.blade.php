@@ -19,7 +19,11 @@
         }
 
         .content{
-            
+            background: #20262E;
+            padding: 2rem;
+            padding-top: 0;
+            min-height: min-content;
+            border-radius: 10px;
         }
 
         .title{
@@ -33,6 +37,7 @@
         }
 
         .button{
+            display: block;
             background: #34D3A3;
             color: #FFF;
             padding: 1rem;
@@ -40,6 +45,13 @@
             border-radius: 20px;
             border: none;
             cursor: pointer;
+            text-decoration: none;
+            max-width: 20rem;
+            margin: auto;
+        }
+
+        .button:hover {
+            background: #45E4B4;
         }
     </style>
 </head>

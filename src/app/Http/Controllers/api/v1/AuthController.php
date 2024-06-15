@@ -75,7 +75,13 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Your email or password are incorrect.'], 403);
             }
 
+            
             $user = Auth::user();
+
+            if($user->role === "forgotten") {
+                $user->role = $user->active ? 'user' : 'inactive';
+                $user->save();
+            }
 
             $token = $user->createToken('token-name', $user->getRoleAbilities());
 
