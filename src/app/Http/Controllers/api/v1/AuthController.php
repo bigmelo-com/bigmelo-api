@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\RecoveryPasswordRequest;
+use App\Http\Requests\User\ResetPasswordRequest;
 use App\Http\Requests\User\SignUpRequest;
 use App\Mail\RecoveryPasswordMail;
 use App\Models\User;
@@ -198,7 +200,7 @@ class AuthController extends Controller
         }
     }
 
-    public function passwordRecovery(Request $request): JsonResponse
+    public function passwordRecovery(RecoveryPasswordRequest $request): JsonResponse
     {
         try {
             $user = User::where('email', $request->email)->first();
@@ -214,13 +216,33 @@ class AuthController extends Controller
             $user->save();
             $token = $user->createToken('recovery-token', $user->getRoleAbilities());
             $data = [
-                'link' => config("bigmelo.client.url") . '/reset-password?token=' . $token->plainTextToken
+                'link' => config("bigmelo.client.url") . '/reset-password/' . $token->plainTextToken
             ];
 
             Mail::to($user->email)->send(new RecoveryPasswordMail($data));
 
             return response()->json(
                 ['message' => 'Recovery link has been seent'],
+                200
+            );
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+
+        }
+    }
+
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            $user->password = Hash::make($request->password);
+            $user->role = 'user';
+            $user->tokens()->delete();
+            $user->save();
+
+            return response()->json(
+                ['message' => $user],
                 200
             );
 

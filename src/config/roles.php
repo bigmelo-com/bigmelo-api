@@ -57,7 +57,7 @@ return [
     ],
     'forgotten' => [
         'abilities' => [
-            'password:recovery'
+            'password:reset'
         ]
     ]
 ];

@@ -22,6 +22,7 @@ Route::prefix('/auth')->group(function() {
     Route::post('/get-token', 'App\Http\Controllers\api\v1\AuthController@getToken');
     Route::post('/signup', 'App\Http\Controllers\api\v1\AuthController@signUp');
     Route::post('/password-recovery', 'App\Http\Controllers\api\v1\AuthController@passwordRecovery');
+    Route::post('/reset-password', 'App\Http\Controllers\api\v1\AuthController@resetPassword')->middleware(['auth:sanctum', 'abilities:password:reset']);
 });
 
 Route::prefix('/message')->group(function() {
