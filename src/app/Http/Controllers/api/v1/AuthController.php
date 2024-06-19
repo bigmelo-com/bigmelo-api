@@ -200,6 +200,47 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Initiate password recovery for a user.
+     *
+     * @param RecoveryPasswordRequest $request
+     * @return JsonResponse
+     * 
+     * @OA\Post(
+     *     path="/v1/auth/password-recovery",
+     *     tags={"Auth"},
+     *     summary="Initiate password recovery",
+     *     description="Sends a password recovery link to the user's email if it exists",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User email",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com", description="The user's email address"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Recovery link sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Recovery link has been seent")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Email not linked to any user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Email not linked to any user")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
     public function passwordRecovery(RecoveryPasswordRequest $request): JsonResponse
     {
         try {
@@ -232,6 +273,43 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Reset user password.
+     *
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     * 
+     * @OA\Post(
+     *     path="/v1/auth/reset-password",
+     *     tags={"Auth"},
+     *     summary="Reset password",
+     *     description="Resets the password for the authenticated user",
+     *     security={
+     *         {"bearerAuth": {}},
+     *     },
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="New user password",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="password", type="string", format="password", example="new_password123", description="The user's new password"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Password reset successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Password reset successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
+     */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         try {
@@ -242,7 +320,7 @@ class AuthController extends Controller
             $user->save();
 
             return response()->json(
-                ['message' => $user],
+                ['message' => "Password updated succesfully"],
                 200
             );
 
