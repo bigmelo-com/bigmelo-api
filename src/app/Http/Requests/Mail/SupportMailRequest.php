@@ -15,7 +15,7 @@ class SupportMailRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'form_email' => 'required|string',
+            'form_email' => 'required|email:rfc,dns',
             'message' => 'required|string',
         ];
     }

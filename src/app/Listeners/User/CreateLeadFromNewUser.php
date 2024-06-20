@@ -58,8 +58,7 @@ class CreateLeadFromNewUser
                 "organization_id: " . $organization->id . ", " .
                 "project_id: " . $project->id . ", " .
                 "user_id: " . $user->id . ", " .
-                "lead_id: " . $lead->id . ", " .
-                "plan_id: " . $plan->id
+                "lead_id: " . $lead->id . ", "
             );
 
         } catch (\Throwable $e) {
