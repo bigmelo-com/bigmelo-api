@@ -11,6 +11,7 @@ use App\Models\ProjectContent;
 use App\Models\ProjectEmbedding;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProjectEmbeddingController extends Controller
 {
@@ -113,6 +114,11 @@ class ProjectEmbeddingController extends Controller
             );
 
         } catch (\Throwable $e) {
+            Log::error(
+                get_class($this) . ' - store. ' .
+                $e->getTraceAsString()
+            );
+
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -138,10 +144,12 @@ class ProjectEmbeddingController extends Controller
             $embeddings = [];
 
             foreach ($request->data as $text) {
+                $openai_embedding = $chat_gpt_client->getEmbedding($text);
+
                 $embeddings[] = [
                     'project_id'    => $project->id,
                     'text'          => $text,
-                    'embedding'     => $chat_gpt_client->getEmbedding($text)
+                    'embedding'     => $openai_embedding->getEmbedding()
                 ];
             }
 
@@ -152,6 +160,12 @@ class ProjectEmbeddingController extends Controller
             return response()->json(['message' => 'Storing embeddings for project ' . $project->id], 200);
 
         } catch (\Throwable $e) {
+            throw $e;
+            Log::error(
+                get_class($this) . ' - store_embeddings. ' .
+                $e->getTraceAsString()
+            );
+
             return response()->json(['message' => $e->getMessage()], 500);
 
         }
