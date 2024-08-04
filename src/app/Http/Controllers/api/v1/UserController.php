@@ -6,6 +6,7 @@ use App\Events\User\UserStored;
 use App\Events\User\UserValidated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\ValidateUserRequest;
 use App\Models\User;
 use Carbon\Carbon;
@@ -266,6 +267,67 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return response()->json(['message' => $e->getMessage()], 500);
 
+        }
+    }
+
+    /**
+     * @param UpdateUserRequest $request
+     * @return JsonResponse
+     *
+     * @OA\Patch(
+     *     path="/v1/user/update-user",
+     *     summary="Update User",
+     *     description="Update user information.",
+     *     tags={"Users"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="last_name", type="string", example="Doe"),
+     *             @OA\Property(property="country_code", type="string", example="+57"),
+     *             @OA\Property(property="phone_number", type="string", example="3123456789"),
+     *             @OA\Property(property="full_phone_number", type="string", example="+573123456789"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="new_password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Success")   
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Internal Server Error.")
+     *         )
+     *     )
+     * )
+     */
+    public function updateUser(UpdateUserRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            $user->name = $request->name ?? $user->name;
+            $user->last_name = $request->last_name ?? $user->last_name;
+            $user->country_code = $request->country_code ?? $user->country_code;
+            $user->phone_number = $request->phone_number ?? $user->phone_number;
+            $user->full_phone_number = $request->full_phone_number ?? $user->full_phone_number;
+            $user->email = $request->email ?? $user->email;
+            $user->password = $request->new_password ? Hash::make($request->new_password) : $user->password;
+            $user->save();
+
+            return response()->json(
+                ['message' => 'User updated successfully'],
+                200
+            );
+
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }
