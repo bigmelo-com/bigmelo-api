@@ -33,6 +33,7 @@ return [
             'plan:payment',
             'mail:send',
             'admin:get-dashboard',
+            'user:update',
         ]
     ],
     'user' => [
@@ -47,6 +48,7 @@ return [
             'plan:purchase',
             'plan:payment',
             'mail:send',
+            'user:update',
         ]
     ],
     'inactive' => [

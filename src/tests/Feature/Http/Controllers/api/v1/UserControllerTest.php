@@ -275,4 +275,56 @@ class UserControllerTest extends TestApi
         $response->assertJsonPath('message', 'Not Authorized.');
     }
 
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function user_update_information_successfully()
+    {
+
+        $new_data = [
+            'name' => 'newName',
+            'last_name' => 'newLastName',
+            'country_code' => '+57',
+            'phone_number' => '3451237890',
+            'full_phone_number' => '+573451237890',
+            'email' => 'newMail@test.com',
+            'new_password' => 'newPasswordTest',
+            'new_password_confirmation' => 'newPasswordTest',
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->getToken())
+            ->json('PATCH', self::ENDPOINT_USER . '/update-user', $new_data);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('message', 'User updated successfully');
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function unauthenticated_user_update_information_failed()
+    {
+
+        $new_data = [
+            'name' => 'newName',
+            'last_name' => 'newLastName',
+            'country_code' => '+57',
+            'phone_number' => '3451237890',
+            'full_phone_number' => '+573451237890',
+            'email' => 'newMail@test.com',
+            'new_password' => 'newPasswordTest',
+            'new_password_confirmation' => 'newPasswordTest',
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer NotValidToken')
+            ->json('PATCH', self::ENDPOINT_USER . '/update-user', $new_data);
+
+        $response->assertStatus(401);
+        $response->assertJsonPath('message', 'Unauthenticated.');
+    }
+
 }
